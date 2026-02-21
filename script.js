@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const step = currentMode.steps[currentStepIndex];
         const duration = currentMode.times[currentStepIndex];
 
-        holdTimer.innerText = "";
+        // Sécurité : on ne modifie le texte que si la zone existe bien dans le HTML
+        if (holdTimer) holdTimer.innerText = "";
         circle.classList.remove('apnea-active');
         clearInterval(holdInterval);
 
@@ -55,11 +56,16 @@ document.addEventListener('DOMContentLoaded', () => {
             statusText.innerText = "Bloquez";
             circle.classList.add('apnea-active');
             let secondsLeft = duration / 1000;
-            holdTimer.innerText = secondsLeft;
+            
+            if (holdTimer) holdTimer.innerText = secondsLeft;
+            
             holdInterval = setInterval(() => {
                 secondsLeft--;
-                if (secondsLeft > 0) holdTimer.innerText = secondsLeft;
-                else clearInterval(holdInterval);
+                if (secondsLeft > 0) {
+                    if (holdTimer) holdTimer.innerText = secondsLeft;
+                } else {
+                    clearInterval(holdInterval);
+                }
             }, 1000);
         }
 
@@ -97,3 +103,4 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-stop').addEventListener('click', () => endSession(false));
     document.getElementById('btn-restart').addEventListener('click', () => { switchView('modes'); statusText.innerText = "Que recherchez-vous ?"; });
 });
+
