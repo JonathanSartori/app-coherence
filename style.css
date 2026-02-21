@@ -1,80 +1,78 @@
 :root {
-    --bg-color: #0f172a;
-    --card-bg: #1e293b;
-    --accent-color: #38bdf8;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
+    --platypus-dark: #1a2c38;
+    --platypus-accent: #48c0b5; /* Turquoise signature */
+    --platypus-stop: #b91c1c; 
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--platypus-dark);
+    color: var(--text-main);
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    overflow: hidden;
 }
 
 .app-card {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 32px;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
     text-align: center;
-    width: 90%;
+    width: 100%;
     max-width: 400px;
 }
 
-h1 { margin: 0; font-weight: 600; font-size: 1.5rem; }
-p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; }
+.logo {
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.logo span {
+    color: var(--platypus-accent);
+}
+
+#status {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
 
 .visualizer {
-    position: relative;
-    height: 300px;
+    height: 350px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 2rem 0;
 }
 
 #guide-circle {
     width: 60px;
     height: 60px;
-    background: var(--accent-color);
+    background: var(--platypus-accent);
     border-radius: 50%;
-    filter: blur(2px);
-    box-shadow: 0 0 30px var(--accent-color);
-    transition: transform 5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-    opacity: 0.8;
-}
-
-#instruction {
-    position: absolute;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    pointer-events: none;
+    /* Transition très douce pour la cohérence */
+    transition: transform 5s cubic-bezier(0.4, 0, 0.6, 1);
+    box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
 }
 
 #main-btn {
-    background: var(--accent-color);
-    color: var(--bg-color);
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 16px;
-    font-weight: bold;
-    font-size: 1rem;
+    background: transparent;
+    color: var(--platypus-accent);
+    border: 1px solid var(--platypus-accent);
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 0.9rem;
     cursor: pointer;
-    width: 100%;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
 }
 
-#main-btn:active { transform: scale(0.98); }
-
-/* États d'animation */
-.expand { transform: scale(4); }
-.shrink { transform: scale(1); }
+/* Style discret pour l'arrêt */
+#main-btn.active {
+    color: var(--text-muted);
+    border-color: #334155;
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
