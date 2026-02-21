@@ -1,10 +1,85 @@
-/* ... conserver le code précédent ... */
+:root {
+    --platypus-dark: #1a2c38;
+    --platypus-accent: #48c0b5;
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+}
+
+body {
+    background-color: var(--platypus-dark);
+    color: var(--text-main);
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.app-card {
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+
+.logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.logo span {
+    color: var(--platypus-accent);
+}
+
+#status {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    height: 20px;
+}
 
 .hidden {
     display: none !important;
 }
 
-/* Sélecteur de temps */
+/* Sélection des modes */
+.mode-selector {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0;
+    margin-top: 10px;
+    scrollbar-width: none;
+}
+
+.mode-selector::-webkit-scrollbar {
+    display: none;
+}
+
+.mode-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #334155;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mode-btn.active {
+    background: var(--platypus-accent);
+    color: var(--platypus-dark);
+    border-color: var(--platypus-accent);
+    font-weight: 600;
+}
+
+/* Sélecteur de durée */
 .duration-dropdown {
     background: transparent;
     color: var(--text-main);
@@ -15,16 +90,37 @@
     margin-top: 15px;
     outline: none;
     cursor: pointer;
+    width: 100%;
+    text-align: center;
 }
 
 .duration-dropdown option {
     background: var(--platypus-dark);
 }
 
-/* Barre de progression */
+/* Visualiseur (La bulle) */
+.visualizer {
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+#guide-circle {
+    width: 60px;
+    height: 60px;
+    background: var(--platypus-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
+    /* La transition sera écrasée par le JS pour s'adapter au mode, mais on garde une base */
+    transition: transform 1s ease-in-out; 
+}
+
+/* Progression */
 #progress-zone {
     width: 100%;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .progress-bar-container {
@@ -39,29 +135,55 @@
     height: 100%;
     width: 0%;
     background: var(--platypus-accent);
-    transition: width 1s linear; /* Pour une progression fluide seconde par seconde */
+    transition: width 1s linear;
 }
 
 #time-left {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
     margin-top: 8px;
-    font-variant-numeric: tabular-nums; /* Garde les chiffres alignés */
-    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
 }
 
-/* Message de coaching */
+/* Bouton principal */
+#main-btn {
+    background: transparent;
+    color: var(--platypus-accent);
+    border: 1px solid var(--platypus-accent);
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#main-btn.active {
+    color: var(--text-muted);
+    border-color: #334155;
+    font-size: 0.9rem;
+    opacity: 0.6;
+}
+
+/* Conseil Coaching */
 #coaching-tip {
     font-style: italic;
     color: var(--platypus-accent);
     font-size: 0.9rem;
     line-height: 1.5;
-    margin: 10px 0 20px 0;
+    margin: 0 0 20px 0;
     min-height: 40px;
-    animation: fadeIn 1s ease-in;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.learn-more {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
 }
