@@ -29,20 +29,43 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedDuration = 180;
 
     const MODES = {
-        equilibre: { steps: ['inhale', 'exhale'], times: [5000, 5000], label: "Équilibre", tip: "Votre système nerveux est réinitialisé. Vous pouvez reprendre le cours de votre journée avec clarté." },
-        calme: { steps: ['inhale', 'exhale'], times: [4000, 6000], label: "Retour au calme", tip: "Le calme est revenu. Prenez un instant pour mémoriser cette sensation de relâchement." },
-        sommeil: { steps: ['inhale', 'exhale'], times: [4000, 8000], label: "Sommeil", tip: "Votre corps est prêt pour le repos. Laissez cette douceur vous accompagner." },
-        focus: { steps: ['inhale', 'exhale'], times: [6000, 4000], label: "Focus", tip: "Votre esprit est vif et oxygéné. Utilisez cette belle énergie pour votre prochaine action." },
-        carree: { steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], label: "Respiration Carrée", tip: "Vous avez repris le contrôle. Profitez de cette lucidité mentale totale." }
+        equilibre: { 
+            steps: ['inhale', 'exhale'], 
+            times: [5000, 5000], 
+            label: "Cohérence Cardiaque", 
+            tip: "Votre système nerveux est réinitialisé. Vous pouvez reprendre le cours de votre journée avec clarté." 
+        },
+        calme: { 
+            steps: ['inhale', 'exhale'], 
+            times: [4000, 6000], 
+            label: "Retour au calme", 
+            tip: "Le calme est revenu. Prenez un instant pour mémoriser cette sensation de relâchement." 
+        },
+        sommeil: { 
+            steps: ['inhale', 'exhale'], 
+            times: [4000, 8000], 
+            label: "Sommeil profond", 
+            tip: "Votre corps est prêt pour le repos. Laissez cette douceur vous accompagner vers une nuit paisible." 
+        },
+        focus: { 
+            steps: ['inhale', 'exhale'], 
+            times: [6000, 4000], 
+            label: "Focus & Énergie", 
+            tip: "Votre esprit est vif et oxygéné. Utilisez cette belle énergie pour votre prochaine action clé." 
+        },
+        carree: { 
+            steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], 
+            times: [4000, 4000, 4000, 4000], 
+            label: "Respiration Carrée", 
+            tip: "Vous avez repris le contrôle. Profitez de cette lucidité mentale totale pour la suite." 
+        }
     };
 
     let currentMode = MODES.equilibre;
 
     // 4. Utilitaires
     function switchView(viewName) {
-        // Enlève la classe active de toutes les vues
         Object.values(views).forEach(view => view.classList.remove('active'));
-        // Ajoute la classe active à la vue demandée
         views[viewName].classList.add('active');
     }
 
@@ -57,23 +80,28 @@ document.addEventListener('DOMContentLoaded', () => {
         catch (err) { console.warn("WakeLock non supporté"); }
     }
 
-    // 5. Logique de Respiration
+    // 5. Logique de Respiration (Moteur d'animation)
     function updateCycle() {
         if (!isActive) return;
         const step = currentMode.steps[currentStepIndex];
         const duration = currentMode.times[currentStepIndex];
 
-        circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
+        // Transition combinée pour la taille (transform) et la transparence (opacity)
+        circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1), opacity ${duration}ms linear`;
 
         if (step === 'inhale') { 
             circle.style.transform = "scale(4.5)"; 
+            circle.style.opacity = "1";
             statusText.innerText = "Inspiration..."; 
         } else if (step === 'holdFull') { 
+            circle.style.opacity = "0.3"; // S'estompe pour indiquer la durée de l'apnée pleine
             statusText.innerText = "Bloquez"; 
         } else if (step === 'exhale') { 
             circle.style.transform = "scale(1)"; 
+            circle.style.opacity = "1";
             statusText.innerText = "Expiration..."; 
         } else if (step === 'holdEmpty') { 
+            circle.style.opacity = "0.3"; // S'estompe pour indiquer la durée de l'apnée vide
             statusText.innerText = "Bloquez"; 
         }
 
@@ -94,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switchView('session');
         requestWakeLock();
         
-        // Petit délai (1s) pour laisser le temps de s'installer avant que la bulle bouge
+        // Délai de préparation avant le premier cycle
         setTimeout(() => {
             if(!isActive) return;
             updateCycle();
@@ -115,8 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(intervalId);
         if (wakeLock) wakeLock.release().then(() => wakeLock = null);
 
-        circle.style.transition = "transform 1s ease-out";
+        // Reset visuel du guide
+        circle.style.transition = "transform 1.5s ease-out, opacity 1.5s ease-out";
         circle.style.transform = "scale(1)";
+        circle.style.opacity = "1";
 
         if (completed) {
             statusText.innerText = "Séance terminée";
