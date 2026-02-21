@@ -1,0 +1,33 @@
+body {
+    background-color: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+.container { text-align: center; }
+
+#circle-container {
+    width: 300px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#guide-circle {
+    width: 50px;
+    height: 50px;
+    background-color: #3498db;
+    border-radius: 50%;
+    opacity: 0.7;
+    transition: all 5s ease-in-out; /* 5 secondes pour monter/descendre */
+}
+
+/* Classe activée par le JS */
+.inhale { transform: scale(5); background-color: #2ecc71; }
+.exhale { transform: scale(1); background-color: #3498db; }
