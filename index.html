@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Platypus Flow</title>
-    
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-512.png">
@@ -14,53 +13,73 @@
     <div class="app-card">
         <header>
             <div class="logo">Platypus<span>Flow</span></div>
-            <p id="status">Sélectionnez votre mode</p>
+            <p id="status">Que recherchez-vous ?</p>
         </header>
 
-        <div id="setup-zone">
-            <div class="mode-selector">
-                <button class="mode-btn active" data-mode="equilibre">Équilibre</button>
-                <button class="mode-btn" data-mode="calme">Calme</button>
-                <button class="mode-btn" data-mode="sommeil">Sommeil</button>
-                <button class="mode-btn" data-mode="focus">Focus</button>
-                <button class="mode-btn" data-mode="carree">Carrée</button>
+        <div id="view-modes" class="view active">
+            <div class="card" data-mode="equilibre">
+                <h3>Équilibre</h3>
+                <p>Cohérence cardiaque classique (5s / 5s). Idéal pour se recentrer.</p>
             </div>
-            
-            <select id="duration-select" class="duration-dropdown">
-                <option value="120">2 minutes</option>
-                <option value="180" selected>3 minutes</option>
-                <option value="300">5 minutes</option>
-            </select>
-        </div>
-
-        <div id="progress-zone" class="hidden">
-            <div class="progress-bar-container">
-                <div id="progress-fill"></div>
+            <div class="card" data-mode="calme">
+                <h3>Retour au calme</h3>
+                <p>Expiration allongée (4s / 6s). Apaise le système nerveux.</p>
             </div>
-            <div id="time-left">03:00</div>
+            <div class="card" data-mode="sommeil">
+                <h3>Sommeil</h3>
+                <p>Ralentissement profond (4s / 8s). Prépare le corps au repos.</p>
+            </div>
+            <div class="card" data-mode="focus">
+                <h3>Focus & Énergie</h3>
+                <p>Inspiration tonique (6s / 4s). Stimule la concentration.</p>
+            </div>
+            <div class="card" data-mode="carree">
+                <h3>Respiration Carrée</h3>
+                <p>Égalité avec apnées (4s). Lucidé mentale et contrôle.</p>
+            </div>
         </div>
 
-        <div class="visualizer">
-            <div id="guide-circle"></div>
+        <div id="view-duration" class="view hidden">
+            <button class="back-btn" id="btn-back-modes">← Changer de mode</button>
+            <div class="card" data-duration="120">
+                <h3>2 minutes</h3>
+                <p>Pause rapide et efficace</p>
+            </div>
+            <div class="card" data-duration="180">
+                <h3>3 minutes</h3>
+                <p>Le standard recommandé</p>
+            </div>
+            <div class="card" data-duration="300">
+                <h3>5 minutes</h3>
+                <p>Détente et ancrage profonds</p>
+            </div>
         </div>
 
-        <div id="coaching-tip" class="hidden"></div>
+        <div id="view-session" class="view hidden">
+            <div id="progress-zone">
+                <div class="progress-bar-container">
+                    <div id="progress-fill"></div>
+                </div>
+                <div id="time-left">00:00</div>
+            </div>
 
-        <div class="controls">
-            <button id="main-btn">Démarrer la séance</button>
+            <div class="visualizer">
+                <div id="guide-circle"></div>
+            </div>
+
+            <button id="btn-stop" class="outline-btn">Interrompre la séance</button>
+        </div>
+
+        <div id="view-end" class="view hidden">
+            <h2 id="end-title">Bravo.</h2>
+            <div id="coaching-tip"></div>
+            <button id="btn-restart" class="primary-btn">Nouvelle séance</button>
         </div>
 
         <footer>
             <a href="https://votre-site.com" target="_blank" class="learn-more">Platypus Coaching →</a>
         </footer>
     </div>
-
     <script src="script.js"></script>
-    
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-    </script>
 </body>
 </html>
