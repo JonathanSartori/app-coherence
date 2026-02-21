@@ -1,28 +1,55 @@
 const circle = document.getElementById('guide-circle');
 const instruction = document.getElementById('instruction');
-const btn = document.getElementById('start-btn');
+const statusText = document.getElementById('status');
+const btn = document.getElementById('main-btn');
 
 let isActive = false;
+let timeoutId = null;
 
-function breathCycle() {
+function updateCycle(phase) {
     if (!isActive) return;
 
-    // Inspiration
-    instruction.innerText = "Inspirez...";
-    circle.className = "inhale";
-    
-    setTimeout(() => {
-        if (!isActive) return;
-        // Expiration
-        instruction.innerText = "Expirez...";
-        circle.className = "exhale";
+    if (phase === 'inhale') {
+        instruction.innerText = "Inspirez";
+        circle.style.transform = "scale(4)";
+        statusText.innerText = "L'air entre doucement...";
         
-        setTimeout(breathCycle, 5000); // Relance le cycle après 5s
-    }, 5000);
+        timeoutId = setTimeout(() => updateCycle('exhale'), 5000);
+    } else {
+        instruction.innerText = "Expirez";
+        circle.style.transform = "scale(1)";
+        statusText.innerText = "Relâchez les tensions...";
+        
+        timeoutId = setTimeout(() => updateCycle('inhale'), 5000);
+    }
+}
+
+function stopSession() {
+    isActive = false;
+    clearTimeout(timeoutId); // Arrête le cycle en cours immédiatement
+    circle.style.transform = "scale(1)";
+    instruction.innerText = "Démarrer";
+    statusText.innerText = "Session interrompue";
+    btn.innerText = "Recommencer";
+    btn.style.background = "var(--accent-color)";
+}
+
+function startSession() {
+    isActive = true;
+    btn.innerText = "Arrêter la séance";
+    btn.style.background = "#ef4444"; // Rouge pour l'arrêt
+    updateCycle('inhale');
 }
 
 btn.addEventListener('click', () => {
-    isActive = !isActive;
-    btn.innerText = isActive ? "Arrêter" : "Démarrer (5 min)";
-    if (isActive) breathCycle();
+    if (isActive) {
+        stopSession();
+    } else {
+        startSession();
+    }
 });
+
+// Enregistrement du Service Worker (pour le PWA)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+}
