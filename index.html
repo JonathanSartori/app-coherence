@@ -35,7 +35,7 @@
             </div>
             <div class="card" data-mode="carree">
                 <h3>Respiration Carrée</h3>
-                <p>Pour la maîtrise de soi. Des pauses visuelles pour retrouver une lucidité mentale totale.</p>
+                <p>Pour la maîtrise de soi. Un décompte visuel pour retrouver une lucidité totale.</p>
             </div>
         </div>
 
@@ -43,15 +43,15 @@
             <button class="back-btn" id="btn-back-modes">← Changer de mode</button>
             <div class="card" data-duration="120">
                 <h3>2 minutes</h3>
-                <p>Une pause rapide et efficace pour se recentrer.</p>
+                <p>Une pause rapide et efficace.</p>
             </div>
             <div class="card" data-duration="180">
                 <h3>3 minutes</h3>
-                <p>Le standard recommandé pour un effet durable.</p>
+                <p>Le standard recommandé.</p>
             </div>
             <div class="card" data-duration="300">
                 <h3>5 minutes</h3>
-                <p>Pour une détente et un ancrage vraiment profonds.</p>
+                <p>Détente et ancrage profonds.</p>
             </div>
         </div>
 
@@ -64,10 +64,9 @@
             </div>
 
             <div class="visualizer">
-                <svg class="progress-ring" width="280" height="280">
-                    <circle id="hold-ring" cx="140" cy="140" r="130" stroke="#48c0b5" stroke-width="6" fill="transparent" />
-                </svg>
-                <div id="guide-circle"></div>
+                <div id="guide-circle">
+                    <span id="hold-timer"></span>
+                </div>
             </div>
 
             <button id="btn-stop" class="outline-btn">Interrompre la séance</button>
