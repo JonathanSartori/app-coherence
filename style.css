@@ -89,47 +89,35 @@ body {
     line-height: 1.4; 
 }
 
-/* Visualiseur (Le cœur du centrage) */
+/* Visualiseur (Le conteneur) */
 .visualizer { 
-    position: relative; 
     height: 320px; 
     width: 100%; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
+    display: grid; 
+    place-items: center; /* Centre parfaitement tout le contenu */
     margin: 10px 0; 
 }
 
 /* L'anneau SVG */
 .progress-ring { 
-    position: absolute; 
-    top: 50%;
-    left: 50%;
-    /* On recentre le SVG et on le tourne pour que le tracé commence en haut */
-    transform: translate(-50%, -50%) rotate(-90deg); 
+    grid-area: 1 / 1; /* Place l'anneau dans l'unique cellule de la grille */
+    transform: rotate(-90deg); 
     z-index: 1; 
-}
-
-#hold-ring { 
-    stroke-linecap: round; 
-    opacity: 0.1; 
-    transition: stroke-dashoffset 0.5s ease-out, opacity 0.5s;
 }
 
 /* La bulle guide */
 #guide-circle { 
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    /* Point crucial : on force le centre à rester au milieu du parent */
-    transform: translate(-50%, -50%) scale(1);
+    grid-area: 1 / 1; /* Place la bulle dans la MÊME cellule pour la superposer */
     width: 60px; 
     height: 60px; 
     background: var(--platypus-accent); 
     border-radius: 50%; 
     z-index: 2;
     box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
+    transform-origin: center; /* Force le point de départ du grossissement au milieu */
 }
+
+
 
 /* Boutons de contrôle */
 .back-btn { 
@@ -216,3 +204,4 @@ footer {
 }
 
 .learn-more:hover { color: var(--platypus-accent); }
+
