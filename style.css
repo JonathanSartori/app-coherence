@@ -6,61 +6,29 @@
     --text-muted: #94a3b8;
 }
 
-/* Base et Reset */
 body {
     background-color: var(--platypus-dark);
     color: var(--text-main);
-    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    padding: 20px 0;
-    overflow-x: hidden; /* Empêche le scroll horizontal sur mobile */
+    overflow: hidden;
 }
 
-.app-card { 
-    text-align: center; 
-    width: 90%; 
-    max-width: 400px; 
-}
-
-.logo { 
-    font-weight: 700; 
-    font-size: 1.5rem; 
-    letter-spacing: 1px; 
-    margin-bottom: 5px; 
-}
-
+.app-card { text-align: center; width: 90%; max-width: 400px; }
+.logo { font-weight: 700; font-size: 1.5rem; margin-bottom: 5px; }
 .logo span { color: var(--platypus-accent); }
+#status { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; min-height: 20px; }
 
-#status { 
-    color: var(--text-muted); 
-    font-size: 0.85rem; 
-    text-transform: uppercase; 
-    letter-spacing: 2px; 
-    margin-bottom: 20px; 
-    min-height: 20px; 
-}
-
-/* Navigation par Vues */
-.view { 
-    display: none; 
-    flex-direction: column; 
-    gap: 12px; 
-    width: 100%; 
-    animation: fadeIn 0.3s ease-out; 
-}
-
+/* Navigation */
+.view { display: none; flex-direction: column; gap: 12px; width: 100%; animation: fadeIn 0.3s ease-out; }
 .view.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Cartes de sélection */
+/* Cartes */
 .card {
     background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -68,140 +36,54 @@ body {
     padding: 18px;
     text-align: left;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.2s;
+}
+.card:active { transform: scale(0.98); }
+.card h3 { margin: 0 0 5px 0; color: var(--platypus-accent); font-size: 1.1rem; }
+.card p { margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; }
+
+/* Visualiseur & Bulle */
+.visualizer {
+    height: 320px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
 }
 
-.card:active { 
-    transform: scale(0.98); 
-    border-color: var(--platypus-accent); 
-}
-
-.card h3 { 
-    margin: 0 0 6px 0; 
-    color: var(--platypus-accent); 
-    font-size: 1.1rem; 
-}
-
-.card p { 
-    margin: 0; 
-    color: var(--text-muted); 
-    font-size: 0.85rem; 
-    line-height: 1.4; 
-}
-
-/* Visualiseur (Le conteneur) */
-.visualizer { 
-    height: 320px; 
-    width: 100%; 
-    display: grid; 
-    place-items: center; /* Centre parfaitement tout le contenu */
-    margin: 10px 0; 
-}
-
-/* L'anneau SVG */
-.progress-ring { 
-    grid-area: 1 / 1; /* Place l'anneau dans l'unique cellule de la grille */
-    transform: rotate(-90deg); 
-    z-index: 1; 
-}
-
-/* La bulle guide */
-#guide-circle { 
-    grid-area: 1 / 1; /* Place la bulle dans la MÊME cellule pour la superposer */
-    width: 60px; 
-    height: 60px; 
-    background: var(--platypus-accent); 
-    border-radius: 50%; 
-    z-index: 2;
+#guide-circle {
+    width: 60px;
+    height: 60px;
+    background: var(--platypus-accent);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
-    transform-origin: center; /* Force le point de départ du grossissement au milieu */
+    transition: transform 1s ease;
+    transform: scale(1);
 }
 
-
-
-/* Boutons de contrôle */
-.back-btn { 
-    background: transparent; 
-    color: var(--text-muted); 
-    border: none; 
-    font-size: 0.9rem; 
-    text-align: left; 
-    cursor: pointer; 
-    padding: 5px 0;
+#hold-timer {
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--platypus-dark);
 }
 
-.primary-btn { 
-    background: var(--platypus-accent); 
-    color: var(--platypus-dark); 
-    border: none; 
-    padding: 15px; 
-    border-radius: 50px; 
-    font-weight: bold; 
-    width: 100%; 
-    cursor: pointer; 
-    transition: background 0.2s;
+.apnea-active {
+    box-shadow: 0 0 60px rgba(72, 192, 181, 0.7) !important;
 }
 
-.outline-btn { 
-    background: transparent; 
-    color: var(--text-muted); 
-    border: 1px solid #334155; 
-    padding: 12px; 
-    border-radius: 50px; 
-    width: 100%; 
-    margin-top: 20px; 
-    cursor: pointer; 
-}
+/* Boutons & Divers */
+.back-btn { background: transparent; color: var(--text-muted); border: none; cursor: pointer; text-align: left; padding: 5px 0; }
+.primary-btn { background: var(--platypus-accent); color: var(--platypus-dark); border: none; padding: 15px; border-radius: 50px; font-weight: bold; width: 100%; cursor: pointer; }
+.outline-btn { background: transparent; color: var(--text-muted); border: 1px solid #334155; padding: 12px; border-radius: 50px; width: 100%; margin-top: 20px; cursor: pointer; }
 
-/* Barre de progression globale */
 #progress-zone { width: 100%; }
+.progress-bar-container { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
+#progress-fill { height: 100%; width: 0%; background: var(--platypus-accent); transition: width 1s linear; }
+#time-left { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
 
-.progress-bar-container { 
-    width: 100%; 
-    height: 4px; 
-    background: rgba(255, 255, 255, 0.1); 
-    border-radius: 2px; 
-    overflow: hidden; 
-}
-
-#progress-fill { 
-    height: 100%; 
-    width: 0%; 
-    background: var(--platypus-accent); 
-    transition: width 1s linear; 
-}
-
-#time-left { 
-    font-size: 0.9rem; 
-    color: var(--text-muted); 
-    margin-top: 8px; 
-    font-variant-numeric: tabular-nums; 
-}
-
-/* Message de fin de séance */
-#coaching-tip { 
-    font-style: italic; 
-    color: var(--platypus-accent); 
-    padding: 20px; 
-    background: var(--card-bg); 
-    border-radius: 16px; 
-    margin: 20px 0; 
-    line-height: 1.5;
-}
-
-/* Footer */
-footer { 
-    margin-top: 2rem; 
-    border-top: 1px solid rgba(255, 255, 255, 0.05); 
-    padding-top: 1rem; 
-}
-
-.learn-more { 
-    color: var(--text-muted); 
-    text-decoration: none; 
-    font-size: 0.8rem; 
-    transition: color 0.2s;
-}
-
-.learn-more:hover { color: var(--platypus-accent); }
-
+#coaching-tip { font-style: italic; color: var(--platypus-accent); padding: 20px; background: var(--card-bg); border-radius: 16px; margin: 20px 0; }
+footer { margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem; }
+.learn-more { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; }
