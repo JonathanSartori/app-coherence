@@ -1,43 +1,21 @@
-<div class="app-card">
-    <header>
-        <div class="logo">Platypus<span>Coaching</span></div>
-        <p id="status">Sélectionnez votre mode</p>
-    </header>
-
-    <div id="setup-zone">
-        <div class="mode-selector">
-            <button class="mode-btn active" data-mode="equilibre">Équilibre</button>
-            <button class="mode-btn" data-mode="calme">Calme</button>
-            <button class="mode-btn" data-mode="sommeil">Sommeil</button>
-            <button class="mode-btn" data-mode="focus">Focus</button>
-            <button class="mode-btn" data-mode="carree">Carrée</button>
-        </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Platypus Flow</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-512.png">
+</head>
+<body>
+    <div class="app-card">
+        <header>
+            <div class="logo">Platypus<span>Flow</span></div>
+            <p id="status">Sélectionnez votre mode</p>
+        </header>
         
-        <select id="duration-select" class="duration-dropdown">
-            <option value="120">2 minutes</option>
-            <option value="180" selected>3 minutes</option>
-            <option value="300">5 minutes</option>
-        </select>
-    </div>
-
-    <div id="progress-zone" class="hidden">
-        <div class="progress-bar-container">
-            <div id="progress-fill"></div>
         </div>
-        <div id="time-left">03:00</div>
-    </div>
-
-    <div class="visualizer">
-        <div id="guide-circle"></div>
-    </div>
-
-    <div id="coaching-tip" class="hidden"></div>
-
-    <div class="controls">
-        <button id="main-btn">Démarrer la séance</button>
-    </div>
-
-    <footer>
-        <a href="https://votre-site.com/articles" target="_blank" class="learn-more">Comprendre les bienfaits →</a>
-    </footer>
-</div>
+    <script src="script.js"></script>
+</body>
+</html>
