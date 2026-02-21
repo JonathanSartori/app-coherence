@@ -1,6 +1,7 @@
 :root {
     --platypus-dark: #1a2c38;
     --platypus-accent: #48c0b5;
+    --card-bg: #23394a;
     --text-main: #ffffff;
     --text-muted: #94a3b8;
 }
@@ -12,9 +13,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
-    overflow: hidden;
+    padding: 20px 0;
 }
 
 .app-card {
@@ -23,167 +24,56 @@ body {
     max-width: 400px;
 }
 
-.logo {
-    font-weight: 700;
-    font-size: 1.5rem;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
+.logo { font-weight: 700; font-size: 1.5rem; letter-spacing: 1px; margin-bottom: 5px; }
+.logo span { color: var(--platypus-accent); }
+#status { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+
+/* Gestion des vues */
+.view { display: none; flex-direction: column; gap: 12px; width: 100%; animation: fadeIn 0.3s ease-in-out; }
+.view.active { display: flex; }
+.hidden { display: none !important; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.logo span {
-    color: var(--platypus-accent);
-}
-
-#status {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    height: 20px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Sélection des modes */
-.mode-selector {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
-    padding: 10px 0;
-    margin-top: 10px;
-    scrollbar-width: none;
-}
-
-.mode-selector::-webkit-scrollbar {
-    display: none;
-}
-
-.mode-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #334155;
-    color: var(--text-muted);
-    padding: 8px 16px;
-    border-radius: 20px;
-    white-space: nowrap;
-    font-size: 0.8rem;
+/* Design des Cartes */
+.card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 18px;
+    text-align: left;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
-.mode-btn.active {
-    background: var(--platypus-accent);
-    color: var(--platypus-dark);
+.card:active {
+    transform: scale(0.98);
     border-color: var(--platypus-accent);
-    font-weight: 600;
+    background: rgba(72, 192, 181, 0.05);
 }
 
-/* Sélecteur de durée */
-.duration-dropdown {
-    background: transparent;
-    color: var(--text-main);
-    border: 1px solid #334155;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-family: inherit;
-    margin-top: 15px;
-    outline: none;
-    cursor: pointer;
-    width: 100%;
-    text-align: center;
-}
+.card h3 { margin: 0 0 6px 0; color: var(--platypus-accent); font-size: 1.1rem; font-weight: 600; }
+.card p { margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; }
 
-.duration-dropdown option {
-    background: var(--platypus-dark);
-}
+/* Boutons */
+.back-btn { background: transparent; color: var(--text-muted); border: none; font-size: 0.9rem; text-align: left; padding: 0 0 10px 0; cursor: pointer; margin-bottom: 5px;}
+.primary-btn { background: var(--platypus-accent); color: var(--platypus-dark); border: none; padding: 15px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 20px;}
+.outline-btn { background: transparent; color: var(--text-muted); border: 1px solid #334155; padding: 12px; border-radius: 50px; font-size: 0.9rem; cursor: pointer; width: 100%; margin-top: 30px;}
 
-/* Visualiseur (La bulle) */
-.visualizer {
-    height: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
-}
+/* Visualiseur et Progression */
+.visualizer { height: 280px; display: flex; justify-content: center; align-items: center; }
+#guide-circle { width: 60px; height: 60px; background: var(--platypus-accent); border-radius: 50%; box-shadow: 0 0 40px rgba(72, 192, 181, 0.3); }
 
-#guide-circle {
-    width: 60px;
-    height: 60px;
-    background: var(--platypus-accent);
-    border-radius: 50%;
-    box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
-    /* La transition sera écrasée par le JS pour s'adapter au mode, mais on garde une base */
-    transition: transform 1s ease-in-out; 
-}
+#progress-zone { width: 100%; margin-top: 10px; }
+.progress-bar-container { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
+#progress-fill { height: 100%; width: 0%; background: var(--platypus-accent); transition: width 1s linear; }
+#time-left { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; font-variant-numeric: tabular-nums; }
 
-/* Progression */
-#progress-zone {
-    width: 100%;
-    margin-top: 20px;
-}
-
-.progress-bar-container {
-    width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-#progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--platypus-accent);
-    transition: width 1s linear;
-}
-
-#time-left {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-top: 8px;
-    font-variant-numeric: tabular-nums;
-}
-
-/* Bouton principal */
-#main-btn {
-    background: transparent;
-    color: var(--platypus-accent);
-    border: 1px solid var(--platypus-accent);
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-    margin-top: 10px;
-}
-
-#main-btn.active {
-    color: var(--text-muted);
-    border-color: #334155;
-    font-size: 0.9rem;
-    opacity: 0.6;
-}
-
-/* Conseil Coaching */
-#coaching-tip {
-    font-style: italic;
-    color: var(--platypus-accent);
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin: 0 0 20px 0;
-    min-height: 40px;
-}
-
-footer {
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.learn-more {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.8rem;
-}
+/* Fin de séance */
+#end-title { color: var(--text-main); font-size: 2rem; margin-bottom: 10px; }
+#coaching-tip { font-style: italic; color: var(--platypus-accent); font-size: 1rem; line-height: 1.5; padding: 20px; background: var(--card-bg); border-radius: 16px; }
+footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+.learn-more { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; }
