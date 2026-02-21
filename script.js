@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Éléments du DOM
+    // 1. Éléments du DOM
     const views = {
         modes: document.getElementById('view-modes'),
         duration: document.getElementById('view-duration'),
@@ -13,14 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeLeftDisplay = document.getElementById('time-left');
     const coachingTip = document.getElementById('coaching-tip');
     
-    // Boutons et Cartes
+    // 2. Boutons et Cartes
     const modeCards = document.querySelectorAll('#view-modes .card');
     const durationCards = document.querySelectorAll('#view-duration .card');
     const btnBackModes = document.getElementById('btn-back-modes');
     const btnStop = document.getElementById('btn-stop');
     const btnRestart = document.getElementById('btn-restart');
 
-    // État de l'application
+    // 3. État de l'application
     let isActive = false;
     let timeoutId = null;
     let intervalId = null;
@@ -29,18 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedDuration = 180;
 
     const MODES = {
-        equilibre: { steps: ['inhale', 'exhale'], times: [5000, 5000], label: "Équilibre", tip: "Votre système nerveux est réinitialisé. Vous êtes prêt(e) à aborder la suite avec clarté." },
-        calme: { steps: ['inhale', 'exhale'], times: [4000, 6000], label: "Retour au calme", tip: "Le calme est revenu. Gardez cette sensation de relâchement pour les prochaines heures." },
+        equilibre: { steps: ['inhale', 'exhale'], times: [5000, 5000], label: "Équilibre", tip: "Votre système nerveux est réinitialisé. Vous pouvez reprendre le cours de votre journée avec clarté." },
+        calme: { steps: ['inhale', 'exhale'], times: [4000, 6000], label: "Retour au calme", tip: "Le calme est revenu. Prenez un instant pour mémoriser cette sensation de relâchement." },
         sommeil: { steps: ['inhale', 'exhale'], times: [4000, 8000], label: "Sommeil", tip: "Votre corps est prêt pour le repos. Laissez cette douceur vous accompagner." },
-        focus: { steps: ['inhale', 'exhale'], times: [6000, 4000], label: "Focus", tip: "Votre esprit est vif. Utilisez cette belle énergie pour votre prochaine action clé." },
-        carree: { steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], label: "Carrée", tip: "Vous avez repris le contrôle. Votre mental est d'une lucidité totale." }
+        focus: { steps: ['inhale', 'exhale'], times: [6000, 4000], label: "Focus", tip: "Votre esprit est vif et oxygéné. Utilisez cette belle énergie pour votre prochaine action." },
+        carree: { steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], label: "Respiration Carrée", tip: "Vous avez repris le contrôle. Profitez de cette lucidité mentale totale." }
     };
 
     let currentMode = MODES.equilibre;
 
-    // Utilitaires
+    // 4. Utilitaires
     function switchView(viewName) {
+        // Enlève la classe active de toutes les vues
         Object.values(views).forEach(view => view.classList.remove('active'));
+        // Ajoute la classe active à la vue demandée
         views[viewName].classList.add('active');
     }
 
@@ -55,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         catch (err) { console.warn("WakeLock non supporté"); }
     }
 
-    // Logique de Respiration
+    // 5. Logique de Respiration
     function updateCycle() {
         if (!isActive) return;
         const step = currentMode.steps[currentStepIndex];
@@ -63,16 +65,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
 
-        if (step === 'inhale') { circle.style.transform = "scale(4.5)"; statusText.innerText = "Inspiration"; } 
-        else if (step === 'holdFull') { statusText.innerText = "Bloquez (plein)"; } 
-        else if (step === 'exhale') { circle.style.transform = "scale(1)"; statusText.innerText = "Expiration"; } 
-        else if (step === 'holdEmpty') { statusText.innerText = "Bloquez (vide)"; }
+        if (step === 'inhale') { 
+            circle.style.transform = "scale(4.5)"; 
+            statusText.innerText = "Inspiration..."; 
+        } else if (step === 'holdFull') { 
+            statusText.innerText = "Bloquez"; 
+        } else if (step === 'exhale') { 
+            circle.style.transform = "scale(1)"; 
+            statusText.innerText = "Expiration..."; 
+        } else if (step === 'holdEmpty') { 
+            statusText.innerText = "Bloquez"; 
+        }
 
         currentStepIndex = (currentStepIndex + 1) % currentMode.steps.length;
         timeoutId = setTimeout(updateCycle, duration);
     }
 
-    // Gestion de la Session
+    // 6. Gestion de la Session
     function startSession() {
         isActive = true;
         currentStepIndex = 0;
@@ -85,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switchView('session');
         requestWakeLock();
         
-        // Petit délai avant de lancer l'animation pour que l'utilisateur se prépare
+        // Petit délai (1s) pour laisser le temps de s'installer avant que la bulle bouge
         setTimeout(() => {
             if(!isActive) return;
             updateCycle();
@@ -119,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Événements de Navigation
+    // 7. Événements de Navigation
     modeCards.forEach(card => {
         card.addEventListener('click', () => {
             currentMode = MODES[card.dataset.mode];
