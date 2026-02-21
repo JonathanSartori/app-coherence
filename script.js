@@ -1,3 +1,4 @@
+// Sélection des éléments HTML
 const circle = document.getElementById('guide-circle');
 const statusText = document.getElementById('status');
 const btn = document.getElementById('main-btn');
@@ -9,6 +10,7 @@ const progressFill = document.getElementById('progress-fill');
 const timeLeftDisplay = document.getElementById('time-left');
 const coachingTip = document.getElementById('coaching-tip');
 
+// Variables d'état
 let isActive = false;
 let timeoutId = null;
 let intervalId = null;
@@ -17,44 +19,47 @@ let totalTime = 0;
 let timeRemaining = 0;
 let currentStepIndex = 0;
 
+// Configuration des modes
 const MODES = {
     equilibre: { 
         steps: ['inhale', 'exhale'], times: [5000, 5000], label: "Équilibre",
-        tip: "Votre système nerveux est réinitialisé. Vous êtes prêt(e) à aborder la suite avec clarté et ancrage."
+        tip: "Votre système nerveux est réinitialisé. Vous êtes prêt(e) à aborder la suite avec clarté."
     },
     calme: { 
         steps: ['inhale', 'exhale'], times: [4000, 6000], label: "Retour au calme",
-        tip: "Le calme est revenu. Gardez cette sensation de relâchement dans vos épaules pour les prochaines heures."
+        tip: "Le calme est revenu. Gardez cette sensation de relâchement pour les prochaines heures."
     },
     sommeil: { 
         steps: ['inhale', 'exhale'], times: [4000, 8000], label: "Sommeil",
-        tip: "Votre corps est prêt pour le repos. Laissez cette douceur vous accompagner vers un sommeil profond."
+        tip: "Votre corps est prêt pour le repos. Laissez cette douceur vous accompagner."
     },
     focus: { 
         steps: ['inhale', 'exhale'], times: [6000, 4000], label: "Focus",
-        tip: "Votre esprit est vif et oxygéné. Utilisez cette belle énergie pour votre prochaine action clé."
+        tip: "Votre esprit est vif. Utilisez cette belle énergie pour votre prochaine action clé."
     },
     carree: { 
         steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], label: "Carrée",
-        tip: "Vous avez repris le contrôle. Votre métabolisme est stabilisé, votre mental est d'une lucidité totale."
+        tip: "Vous avez repris le contrôle. Votre mental est d'une lucidité totale."
     }
 };
 
 let currentMode = MODES.equilibre;
 
-// Formatage du temps (ex: 180 -> "03:00")
+// Formatage du temps
 function formatTime(seconds) {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
 }
 
+// Gestion de l'anti-veille
 async function requestWakeLock() {
     try {
         if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
-    } catch (err) { console.error(err); }
+    } catch (err) { console.warn("WakeLock non supporté"); }
 }
 
+// Cœur de l'animation
 function updateCycle() {
     if (!isActive) return;
 
@@ -79,17 +84,16 @@ function updateCycle() {
     timeoutId = setTimeout(updateCycle, duration);
 }
 
+// Arrêt de la séance
 function endSession(completed = false) {
     isActive = false;
     clearTimeout(timeoutId);
     clearInterval(intervalId);
     
     if (wakeLock !== null) {
-        wakeLock.release();
-        wakeLock = null;
+        wakeLock.release().then(() => wakeLock = null);
     }
 
-    // Réinitialisation visuelle
     circle.style.transition = "transform 2s ease-out";
     circle.style.transform = "scale(1)";
     progressZone.classList.add('hidden');
@@ -104,20 +108,20 @@ function endSession(completed = false) {
         statusText.innerText = "Sélectionnez votre mode";
         btn.innerText = "Démarrer la séance";
     }
-    
     btn.classList.remove('active');
 }
 
+// Démarrage de la séance
 function startSession() {
     isActive = true;
     currentStepIndex = 0;
     totalTime = parseInt(durationSelect.value);
     timeRemaining = totalTime;
 
-    // Mise à jour de l'interface
     setupZone.classList.add('hidden');
     coachingTip.classList.add('hidden');
     progressZone.classList.remove('hidden');
+    
     timeLeftDisplay.innerText = formatTime(timeRemaining);
     progressFill.style.width = "0%";
     
@@ -127,23 +131,20 @@ function startSession() {
     requestWakeLock();
     updateCycle();
 
-    // Gestion du minuteur global
     intervalId = setInterval(() => {
         timeRemaining--;
         timeLeftDisplay.innerText = formatTime(timeRemaining);
-        
         const progressPercent = ((totalTime - timeRemaining) / totalTime) * 100;
         progressFill.style.width = `${progressPercent}%`;
 
-        if (timeRemaining <= 0) {
-            endSession(true); // Terminé avec succès
-        }
+        if (timeRemaining <= 0) endSession(true);
     }, 1000);
 }
 
-// Gestion des boutons
+// Ecouteurs d'événements
 modeBtns.forEach(button => {
     button.addEventListener('click', () => {
+        if (isActive) return;
         modeBtns.forEach(b => b.classList.remove('active'));
         button.classList.add('active');
         currentMode = MODES[button.dataset.mode];
@@ -152,10 +153,10 @@ modeBtns.forEach(button => {
 
 btn.addEventListener('click', () => {
     if (isActive) {
-        endSession(false); // Interrompu par l'utilisateur
+        endSession(false);
     } else {
-        // Si on relance après une fin de séance, on réaffiche les réglages
-        if (coachingTip.classList.contains('hidden') === false) {
+        // Si on voit le conseil, on réinitialise d'abord l'interface
+        if (!coachingTip.classList.contains('hidden')) {
             coachingTip.classList.add('hidden');
             setupZone.classList.remove('hidden');
             statusText.innerText = "Sélectionnez votre mode";
