@@ -14,13 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeLeftDisplay = document.getElementById('time-left');
     const coachingTip = document.getElementById('coaching-tip');
     
-    // 2. Configuration de l'anneau SVG (apnées)
+    // 2. Boutons et Cartes
+    const modeCards = document.querySelectorAll('#view-modes .card');
+    const durationCards = document.querySelectorAll('#view-duration .card');
+    const btnBackModes = document.getElementById('btn-back-modes');
+    const btnStop = document.getElementById('btn-stop');
+    const btnRestart = document.getElementById('btn-restart');
+
+    // 3. Configuration du cercle de progression (Anneau d'apnée)
     const radius = holdRing.r.baseVal.value;
     const circumference = 2 * Math.PI * radius;
     holdRing.style.strokeDasharray = `${circumference} ${circumference}`;
     holdRing.style.strokeDashoffset = circumference;
 
-    // 3. État de l'application
+    // 4. État de l'application
     let isActive = false;
     let timeoutId = null;
     let intervalId = null;
@@ -51,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
             steps: ['inhale', 'exhale'], 
             times: [6000, 4000], 
             label: "Focus & Énergie", 
-            tip: "Votre esprit est vif et oxygéné. Utilisez cette belle énergie pour votre prochaine action." 
+            tip: "Votre esprit est vif et oxygéné. Utilisez cette belle énergie pour votre prochaine action clé." 
         },
         carree: { 
             steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], 
@@ -63,10 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentMode = MODES.equilibre;
 
-    // 4. Utilitaires de navigation
+    // 5. Utilitaires
     function switchView(viewName) {
         Object.values(views).forEach(view => view.classList.remove('active'));
         views[viewName].classList.add('active');
+    }
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
     }
 
     async function requestWakeLock() {
@@ -74,31 +87,31 @@ document.addEventListener('DOMContentLoaded', () => {
         catch (err) { console.warn("WakeLock non supporté"); }
     }
 
-    // 5. Moteur d'animation (Le cœur du centrage)
+    // 6. Logique de Respiration (Moteur d'animation)
     function updateCycle() {
         if (!isActive) return;
         const step = currentMode.steps[currentStepIndex];
         const duration = currentMode.times[currentStepIndex];
 
-        // On applique les transitions. Notez le centrage forcé par translate(-50%, -50%)
+        // Animation de la bulle (le CSS Grid maintient le centrage, on ne gère que la taille ici)
         circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
 
         if (step === 'inhale' || step === 'exhale') {
-            // Phases de mouvement : on vide l'anneau
+            // PHASES ACTIVES : On vide l'anneau et on le rend discret
             holdRing.style.transition = 'stroke-dashoffset 0.5s ease-out, opacity 0.5s';
             holdRing.style.strokeDashoffset = circumference; 
             holdRing.style.opacity = "0.1"; 
 
             if (step === 'inhale') {
-                circle.style.transform = "translate(-50%, -50%) scale(4.2)";
+                circle.style.transform = "scale(4.2)";
                 statusText.innerText = "Inspiration...";
             } else {
-                circle.style.transform = "translate(-50%, -50%) scale(1)";
+                circle.style.transform = "scale(1)";
                 statusText.innerText = "Expiration...";
             }
         } 
         else if (step === 'holdFull' || step === 'holdEmpty') {
-            // Phases d'apnée : on remplit l'anneau
+            // PHASES D'APNÉE : On remplit l'anneau de manière linéaire
             statusText.innerText = "Bloquez";
             holdRing.style.opacity = "1"; 
             holdRing.style.transition = `stroke-dashoffset ${duration}ms linear`;
@@ -109,13 +122,20 @@ document.addEventListener('DOMContentLoaded', () => {
         timeoutId = setTimeout(updateCycle, duration);
     }
 
-    // 6. Gestion de la Session
+    // 7. Gestion de la Session
     function startSession() {
         isActive = true;
         currentStepIndex = 0;
         let timeRemaining = selectedDuration;
         
         statusText.innerText = currentMode.label;
+        timeLeftDisplay.innerText = formatTime(timeRemaining);
+        progressFill.style.width = "0%";
+        
+        // Reset de l'anneau avant de commencer
+        holdRing.style.transition = 'none';
+        holdRing.style.strokeDashoffset = circumference;
+
         switchView('session');
         requestWakeLock();
         
@@ -125,9 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             intervalId = setInterval(() => {
                 timeRemaining--;
-                const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-                const s = (timeRemaining % 60).toString().padStart(2, '0');
-                timeLeftDisplay.innerText = `${m}:${s}`;
+                timeLeftDisplay.innerText = formatTime(timeRemaining);
                 progressFill.style.width = `${((selectedDuration - timeRemaining) / selectedDuration) * 100}%`;
 
                 if (timeRemaining <= 0) endSession(true);
@@ -141,9 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(intervalId);
         if (wakeLock) wakeLock.release().then(() => wakeLock = null);
 
-        // Reset visuel avec maintien du centrage
+        // Reset visuel du guide avec le centrage géré par le CSS
         circle.style.transition = "transform 1.5s ease-out";
-        circle.style.transform = "translate(-50%, -50%) scale(1)";
+        circle.style.transform = "scale(1)";
         holdRing.style.transition = "opacity 1s";
         holdRing.style.opacity = "0";
 
@@ -157,8 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 7. Écouteurs d'événements
-    document.querySelectorAll('#view-modes .card').forEach(card => {
+    // 8. Événements de Navigation
+    modeCards.forEach(card => {
         card.addEventListener('click', () => {
             currentMode = MODES[card.dataset.mode];
             statusText.innerText = "Combien de temps ?";
@@ -166,21 +184,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('#view-duration .card').forEach(card => {
+    durationCards.forEach(card => {
         card.addEventListener('click', () => {
             selectedDuration = parseInt(card.dataset.duration);
             startSession();
         });
     });
 
-    document.getElementById('btn-back-modes').addEventListener('click', () => {
+    btnBackModes.addEventListener('click', () => {
         statusText.innerText = "Que recherchez-vous ?";
         switchView('modes');
     });
 
-    document.getElementById('btn-stop').addEventListener('click', () => endSession(false));
+    btnStop.addEventListener('click', () => endSession(false));
 
-    document.getElementById('btn-restart').addEventListener('click', () => {
+    btnRestart.addEventListener('click', () => {
         statusText.innerText = "Que recherchez-vous ?";
         switchView('modes');
     });
