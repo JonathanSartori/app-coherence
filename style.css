@@ -16,29 +16,24 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 20px 0;
+    overflow: hidden;
 }
 
-.app-card {
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-}
-
+.app-card { text-align: center; width: 90%; max-width: 400px; }
 .logo { font-weight: 700; font-size: 1.5rem; letter-spacing: 1px; margin-bottom: 5px; }
 .logo span { color: var(--platypus-accent); }
-#status { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+#status { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; min-height: 20px; }
 
-/* Gestion des vues */
+/* Navigation Vues */
 .view { display: none; flex-direction: column; gap: 12px; width: 100%; animation: fadeIn 0.3s ease-in-out; }
 .view.active { display: flex; }
-.hidden { display: none !important; }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Design des Cartes */
+/* Cartes */
 .card {
     background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -48,39 +43,32 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
-.card:active {
-    transform: scale(0.98);
-    border-color: var(--platypus-accent);
-    background: rgba(72, 192, 181, 0.05);
-}
-
-.card h3 { margin: 0 0 6px 0; color: var(--platypus-accent); font-size: 1.1rem; font-weight: 600; }
+.card:active { transform: scale(0.98); border-color: var(--platypus-accent); }
+.card h3 { margin: 0 0 6px 0; color: var(--platypus-accent); font-size: 1.1rem; }
 .card p { margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; }
 
+/* Visualiseur (SVG + Bulle) */
+.visualizer { position: relative; height: 300px; display: flex; justify-content: center; align-items: center; margin: 10px 0; }
+.progress-ring { position: absolute; transform: rotate(-90deg); z-index: 1; }
+#hold-ring { stroke-linecap: round; opacity: 0.1; }
+#guide-circle { 
+    width: 60px; height: 60px; background: var(--platypus-accent); 
+    border-radius: 50%; z-index: 2; position: absolute;
+    box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
+}
+
 /* Boutons */
-.back-btn { background: transparent; color: var(--text-muted); border: none; font-size: 0.9rem; text-align: left; padding: 0 0 10px 0; cursor: pointer; margin-bottom: 5px;}
-.primary-btn { background: var(--platypus-accent); color: var(--platypus-dark); border: none; padding: 15px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 20px;}
-.outline-btn { background: transparent; color: var(--text-muted); border: 1px solid #334155; padding: 12px; border-radius: 50px; font-size: 0.9rem; cursor: pointer; width: 100%; margin-top: 30px;}
+.back-btn { background: transparent; color: var(--text-muted); border: none; font-size: 0.9rem; text-align: left; cursor: pointer; }
+.primary-btn { background: var(--platypus-accent); color: var(--platypus-dark); border: none; padding: 15px; border-radius: 50px; font-weight: bold; width: 100%; cursor: pointer; }
+.outline-btn { background: transparent; color: var(--text-muted); border: 1px solid #334155; padding: 12px; border-radius: 50px; width: 100%; margin-top: 20px; cursor: pointer; }
 
-/* Visualiseur et Progression */
-.visualizer { height: 280px; display: flex; justify-content: center; align-items: center; }
-#guide-circle { width: 60px; height: 60px; background: var(--platypus-accent); border-radius: 50%; box-shadow: 0 0 40px rgba(72, 192, 181, 0.3); }
-
-#progress-zone { width: 100%; margin-top: 10px; }
+/* Progression */
+#progress-zone { width: 100%; }
 .progress-bar-container { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
 #progress-fill { height: 100%; width: 0%; background: var(--platypus-accent); transition: width 1s linear; }
 #time-left { font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; font-variant-numeric: tabular-nums; }
-#hold-ring {
-    stroke: var(--platypus-accent);
-    stroke-width: 4; /* Un peu plus fin pour plus d'élégance */
-    opacity: 0.1; /* Presque invisible au repos */
-    transition: all 0.5s ease;
-}
 
-/* Fin de séance */
-#end-title { color: var(--text-main); font-size: 2rem; margin-bottom: 10px; }
-#coaching-tip { font-style: italic; color: var(--platypus-accent); font-size: 1rem; line-height: 1.5; padding: 20px; background: var(--card-bg); border-radius: 16px; }
-footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+/* Fin */
+#coaching-tip { font-style: italic; color: var(--platypus-accent); padding: 20px; background: var(--card-bg); border-radius: 16px; margin: 20px 0; }
+footer { margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem; }
 .learn-more { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; }
-
