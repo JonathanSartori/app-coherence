@@ -1,78 +1,67 @@
-:root {
-    --platypus-dark: #1a2c38;
-    --platypus-accent: #48c0b5; /* Turquoise signature */
-    --platypus-stop: #b91c1c; 
-    --text-main: #ffffff;
-    --text-muted: #94a3b8;
+/* ... conserver le code précédent ... */
+
+.hidden {
+    display: none !important;
 }
 
-body {
-    background-color: var(--platypus-dark);
-    color: var(--text-main);
-    font-family: 'Montserrat', 'Segoe UI', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
-
-.app-card {
-    text-align: center;
-    width: 100%;
-    max-width: 400px;
-}
-
-.logo {
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-}
-
-.logo span {
-    color: var(--platypus-accent);
-}
-
-#status {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.visualizer {
-    height: 350px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#guide-circle {
-    width: 60px;
-    height: 60px;
-    background: var(--platypus-accent);
-    border-radius: 50%;
-    /* Transition très douce pour la cohérence */
-    transition: transform 5s cubic-bezier(0.4, 0, 0.6, 1);
-    box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
-}
-
-#main-btn {
+/* Sélecteur de temps */
+.duration-dropdown {
     background: transparent;
-    color: var(--platypus-accent);
-    border: 1px solid var(--platypus-accent);
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-size: 0.9rem;
+    color: var(--text-main);
+    border: 1px solid #334155;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    margin-top: 15px;
+    outline: none;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
-/* Style discret pour l'arrêt */
-#main-btn.active {
+.duration-dropdown option {
+    background: var(--platypus-dark);
+}
+
+/* Barre de progression */
+#progress-zone {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+#progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--platypus-accent);
+    transition: width 1s linear; /* Pour une progression fluide seconde par seconde */
+}
+
+#time-left {
+    font-size: 0.85rem;
     color: var(--text-muted);
-    border-color: #334155;
-    font-size: 0.8rem;
-    opacity: 0.6;
+    margin-top: 8px;
+    font-variant-numeric: tabular-nums; /* Garde les chiffres alignés */
+    letter-spacing: 1px;
+}
+
+/* Message de coaching */
+#coaching-tip {
+    font-style: italic;
+    color: var(--platypus-accent);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 10px 0 20px 0;
+    min-height: 40px;
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
