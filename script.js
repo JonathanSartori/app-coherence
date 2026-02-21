@@ -1,5 +1,4 @@
 const circle = document.getElementById('guide-circle');
-const instruction = document.getElementById('instruction');
 const statusText = document.getElementById('status');
 const btn = document.getElementById('main-btn');
 
@@ -10,34 +9,29 @@ function updateCycle(phase) {
     if (!isActive) return;
 
     if (phase === 'inhale') {
-        instruction.innerText = "Inspirez";
-        circle.style.transform = "scale(4)";
-        statusText.innerText = "L'air entre doucement...";
-        
+        circle.style.transform = "scale(4.5)";
+        statusText.innerText = "Inspiration";
         timeoutId = setTimeout(() => updateCycle('exhale'), 5000);
     } else {
-        instruction.innerText = "Expirez";
         circle.style.transform = "scale(1)";
-        statusText.innerText = "Relâchez les tensions...";
-        
+        statusText.innerText = "Expiration";
         timeoutId = setTimeout(() => updateCycle('inhale'), 5000);
     }
 }
 
 function stopSession() {
     isActive = false;
-    clearTimeout(timeoutId); // Arrête le cycle en cours immédiatement
+    clearTimeout(timeoutId);
     circle.style.transform = "scale(1)";
-    instruction.innerText = "Démarrer";
-    statusText.innerText = "Session interrompue";
-    btn.innerText = "Recommencer";
-    btn.style.background = "var(--accent-color)";
+    statusText.innerText = "Cohérence Cardiaque";
+    btn.innerText = "Démarrer la séance";
+    btn.classList.remove('active');
 }
 
 function startSession() {
     isActive = true;
-    btn.innerText = "Arrêter la séance";
-    btn.style.background = "#ef4444"; // Rouge pour l'arrêt
+    btn.innerText = "Arrêter";
+    btn.classList.add('active');
     updateCycle('inhale');
 }
 
@@ -48,8 +42,3 @@ btn.addEventListener('click', () => {
         startSession();
     }
 });
-
-// Enregistrement du Service Worker (pour le PWA)
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-}
