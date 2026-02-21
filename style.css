@@ -1,33 +1,80 @@
+:root {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --accent-color: #38bdf8;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+}
+
 body {
-    background-color: #f0f4f8;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', system-ui, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    font-family: sans-serif;
+    overflow: hidden;
 }
 
-.container { text-align: center; }
+.app-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 32px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
 
-#circle-container {
-    width: 300px;
+h1 { margin: 0; font-weight: 600; font-size: 1.5rem; }
+p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; }
+
+.visualizer {
+    position: relative;
     height: 300px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin: 2rem 0;
 }
 
 #guide-circle {
-    width: 50px;
-    height: 50px;
-    background-color: #3498db;
+    width: 60px;
+    height: 60px;
+    background: var(--accent-color);
     border-radius: 50%;
-    opacity: 0.7;
-    transition: all 5s ease-in-out; /* 5 secondes pour monter/descendre */
+    filter: blur(2px);
+    box-shadow: 0 0 30px var(--accent-color);
+    transition: transform 5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    opacity: 0.8;
 }
 
-/* Classe activée par le JS */
-.inhale { transform: scale(5); background-color: #2ecc71; }
-.exhale { transform: scale(1); background-color: #3498db; }
+#instruction {
+    position: absolute;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    pointer-events: none;
+}
+
+#main-btn {
+    background: var(--accent-color);
+    color: var(--bg-color);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s;
+}
+
+#main-btn:active { transform: scale(0.98); }
+
+/* États d'animation */
+.expand { transform: scale(4); }
+.shrink { transform: scale(1); }
