@@ -2,26 +2,26 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RespiZen - Cohérence Cardiaque</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RespiZen</title>
     <link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#3498db">
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <div class="container">
-        <h1 id="instruction">Prêt ?</h1>
-        <div id="circle-container">
+    <div class="app-card">
+        <header>
+            <h1>Cohérence</h1>
+            <p id="status">Prêt pour votre séance ?</p>
+        </header>
+
+        <div class="visualizer">
             <div id="guide-circle"></div>
+            <div id="instruction">Démarrer</div>
         </div>
-        <button id="start-btn">Démarrer (5 min)</button>
+
+        <button id="main-btn">Commencer</button>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
