@@ -23,10 +23,14 @@ body {
 .logo span { color: var(--platypus-accent); }
 #status { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; min-height: 20px; }
 
-/* Navigation */
+/* Navigation Vues */
 .view { display: none; flex-direction: column; gap: 12px; width: 100%; animation: fadeIn 0.3s ease-out; }
 .view.active { display: flex; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 /* Cartes */
 .card {
@@ -42,43 +46,38 @@ body {
 .card h3 { margin: 0 0 5px 0; color: var(--platypus-accent); font-size: 1.1rem; }
 .card p { margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; }
 
-/* Visualiseur & Bulle */
+/* Visualiseur (Correction : Superposition fixe) */
 .visualizer {
     height: 320px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center; /* Centre bulle + texte sur le même point */
     margin: 10px 0;
+    position: relative;
 }
 
 #guide-circle {
+    grid-area: 1 / 1;
     width: 60px;
     height: 60px;
     background: var(--platypus-accent);
     border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     box-shadow: 0 0 40px rgba(72, 192, 181, 0.3);
     transition: transform 1s ease;
     transform: scale(1);
+    z-index: 1;
 }
 
 #hold-timer {
+    grid-area: 1 / 1;
+    z-index: 2;
     font-weight: 500;
     font-size: 1.4rem;
-    /* Votre nouvelle couleur neutre (blanc à 60% d'opacité) */
-    color: rgba(255, 255, 255, 0.6); 
-    
-    /* PRÉPARATION DE L'ANIMATION */
-    opacity: 0; /* Invisible par défaut */
-    /* La transition durera 0.5 secondes, de manière fluide (ease) */
+    color: rgba(255, 255, 255, 0.6); /* Couleur neutre */
+    opacity: 0;
     transition: opacity 0.5s ease;
-    /* Une petite optimisation pour dire au navigateur de s'y préparer */
-    will-change: opacity;
+    pointer-events: none; /* Ne bloque pas les clics */
 }
 
-/* Le JavaScript ajoutera cette classe pendant l'apnée pour déclencher le fondu */
 #hold-timer.visible {
     opacity: 1;
 }
@@ -87,17 +86,18 @@ body {
     box-shadow: 0 0 60px rgba(72, 192, 181, 0.7) !important;
 }
 
-/* Boutons & Divers */
+/* Boutons */
 .back-btn { background: transparent; color: var(--text-muted); border: none; cursor: pointer; text-align: left; padding: 5px 0; }
 .primary-btn { background: var(--platypus-accent); color: var(--platypus-dark); border: none; padding: 15px; border-radius: 50px; font-weight: bold; width: 100%; cursor: pointer; }
 .outline-btn { background: transparent; color: var(--text-muted); border: 1px solid #334155; padding: 12px; border-radius: 50px; width: 100%; margin-top: 20px; cursor: pointer; }
 
+/* Progression */
 #progress-zone { width: 100%; }
 .progress-bar-container { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
 #progress-fill { height: 100%; width: 0%; background: var(--platypus-accent); transition: width 1s linear; }
 #time-left { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
 
+/* Footer */
 #coaching-tip { font-style: italic; color: var(--platypus-accent); padding: 20px; background: var(--card-bg); border-radius: 16px; margin: 20px 0; }
 footer { margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem; }
 .learn-more { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; }
-
