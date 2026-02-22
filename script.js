@@ -18,10 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let intervalId = null;
     let holdInterval = null;
     let fadeTimeout = null;
+    let instructionTimeout = null; // Gère l'effacement du texte d'instruction
     let wakeLock = null;
     let currentStepIndex = 0;
     let selectedDuration = 180;
-    let audioCtx = null; // Contexte audio pour le son de fin
+    let audioCtx = null;
 
     const MODES = {
         equilibre: { steps: ['inhale', 'exhale'], times: [5000, 5000], label: "Cohérence Cardiaque", tip: "Système nerveux réinitialisé. Calme retrouvé." },
@@ -33,53 +34,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentMode = MODES.equilibre;
 
-    // --- NOUVEAU : SYSTÈME HAPTIQUE ET AUDIO ---
-
-    // Initialise le moteur audio (obligatoire au clic de l'utilisateur)
     function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    // Synthétise un son de bol tibétain zen (432Hz)
     function playEndSound() {
         if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-
-        osc.type = 'sine'; // Onde pure
+        osc.type = 'sine'; 
         osc.frequency.setValueAtTime(432, audioCtx.currentTime); 
-        
-        // Enveloppe sonore : attaque douce, résonance longue
         gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
         gainNode.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 0.1); 
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4); 
-
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 4);
     }
 
-    // Gère les vibrations si le téléphone le permet (Android)
     function triggerVibration(type) {
         if (!('vibrate' in navigator)) return; 
-        
-        if (type === 'inhale' || type === 'exhale') {
-            navigator.vibrate(30); // Micro-impulsion unique
-        } else if (type === 'hold') {
-            navigator.vibrate([20, 50, 20]); // Double micro-impulsion pour l'apnée
-        } else if (type === 'end') {
-            navigator.vibrate([200, 100, 200]); // Vibration longue de fin
-        }
+        if (type === 'inhale' || type === 'exhale') navigator.vibrate(30);
+        else if (type === 'hold') navigator.vibrate([20, 50, 20]);
+        else if (type === 'end') navigator.vibrate([200, 100, 200]);
     }
-
-    // --- FIN DU SYSTÈME HAPTIQUE ET AUDIO ---
 
     function switchView(viewName) {
         Object.values(views).forEach(v => v.classList.remove('active'));
@@ -103,8 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
 
         if (step === 'inhale' || step === 'exhale') {
-            triggerVibration(step); // <-- VIBRATION DE RESPIRATION
-            
+            triggerVibration(step);
             if (holdTimer) {
                 holdTimer.classList.remove('visible');
                 fadeTimeout = setTimeout(() => { if (holdTimer) holdTimer.innerText = ""; }, 500);
@@ -119,8 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } 
         else { 
-            triggerVibration('hold'); // <-- VIBRATION D'APNÉE
-
+            triggerVibration('hold');
             statusText.innerText = "Bloquez";
             circle.classList.add('apnea-active');
             let secondsLeft = duration / 1000;
@@ -145,11 +123,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startSession() {
-        initAudio(); // Débloque le son au moment du clic
-        isActive = true; currentStepIndex = 0;
+        initAudio(); 
+        isActive = true; 
+        currentStepIndex = 0;
         let timeRemaining = selectedDuration;
+        
+        // Mode Immersif
+        document.body.classList.add('session-mode');
+        statusText.classList.remove('text-hidden'); // S'assure que le texte est visible au départ
+        
+        // Fait disparaître les instructions après 30 secondes d'apprentissage
+        instructionTimeout = setTimeout(() => {
+            statusText.classList.add('text-hidden');
+        }, 30000);
+
         switchView('session');
         requestWakeLock();
+        
         setTimeout(() => {
             if(!isActive) return; updateCycle();
             intervalId = setInterval(() => {
@@ -166,16 +156,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function endSession(completed) {
         isActive = false;
-        clearTimeout(timeoutId); clearTimeout(fadeTimeout);
-        clearInterval(intervalId); clearInterval(holdInterval);
+        clearTimeout(timeoutId); 
+        clearTimeout(fadeTimeout);
+        clearTimeout(instructionTimeout); // Stoppe le minuteur d'effacement
+        clearInterval(intervalId); 
+        clearInterval(holdInterval);
         if (wakeLock) wakeLock.release().then(() => wakeLock = null);
         
+        // Quitte le mode immersif
+        document.body.classList.remove('session-mode');
+        statusText.classList.remove('text-hidden');
         circle.style.transform = "scale(1)";
         if (holdTimer) { holdTimer.classList.remove('visible'); holdTimer.innerText = ""; }
 
         if (completed) {
-            playEndSound(); // <-- SON DE FIN
-            triggerVibration('end'); // <-- VIBRATION DE FIN
+            playEndSound(); 
+            triggerVibration('end'); 
             statusText.innerText = "Bravo";
             coachingTip.innerText = currentMode.tip;
             switchView('end');
@@ -185,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Navigation
     document.querySelectorAll('#view-modes .card').forEach(c => c.addEventListener('click', () => { currentMode = MODES[c.dataset.mode]; switchView('duration'); statusText.innerText = "Quelle durée ?"; }));
     document.querySelectorAll('#view-duration .card').forEach(c => c.addEventListener('click', () => { selectedDuration = parseInt(c.dataset.duration); startSession(); }));
     document.getElementById('btn-back-modes').addEventListener('click', () => switchView('modes'));
