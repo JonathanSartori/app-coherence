@@ -1,4 +1,4 @@
-const CACHE_NAME = 'platypus-flow-v12'; // C'est cette ligne qui force la mise à jour
+const CACHE_NAME = 'platypus-flow-v13'; // C'est cette ligne qui force la mise à jour
 const ASSETS = [
   './',
   './index.html',
@@ -23,6 +23,7 @@ self.addEventListener('activate', (e) => {
     ))
   );
 });
+
 
 
 
