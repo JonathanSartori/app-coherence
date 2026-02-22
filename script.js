@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentMode = MODES.equilibre;
 
-    // --- 1. GESTION DE LA VEILLE (WAKE LOCK) ---
+    // --- 1. GESTION DE LA VEILLE ---
     async function requestWakeLock() {
         try {
             if ('wakeLock' in navigator) {
@@ -108,8 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateCycle() {
         if (!isActive) return;
+        
         const step = currentMode.steps[currentStepIndex];
         const duration = currentMode.times[currentStepIndex];
+        
         clearInterval(holdInterval);
         circle.classList.remove('apnea-active');
         circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
@@ -117,8 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (step === 'inhale' || step === 'exhale') {
             triggerVibration(step);
             holdTimer.classList.remove('visible');
-            if (step === 'inhale') { circle.style.transform = "scale(4.2)"; statusText.innerText = "Inspiration..."; }
-            else { circle.style.transform = "scale(1)"; statusText.innerText = "Expiration..."; }
+            if (step === 'inhale') { 
+                circle.style.transform = "scale(4.2)"; 
+                statusText.innerText = "Inspiration..."; 
+            }
+            else { 
+                circle.style.transform = "scale(1)"; 
+                statusText.innerText = "Expiration..."; 
+            }
         } else { 
             triggerVibration('hold');
             statusText.innerText = "Bloquez";
@@ -126,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let sec = duration / 1000; holdTimer.innerText = sec; holdTimer.classList.add('visible');
             holdInterval = setInterval(() => { sec--; if (sec > 0) holdTimer.innerText = sec; }, 1000);
         }
+        
         currentStepIndex = (currentStepIndex + 1) % currentMode.steps.length;
         timeoutId = setTimeout(updateCycle, duration);
     }
@@ -162,12 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function endSession(completed) {
+        // 1. On coupe tout immédiatement
         isActive = false;
         clearTimeout(timeoutId); 
         clearTimeout(instructionTimeout);
         clearInterval(intervalId); 
         clearInterval(holdInterval);
         
+        // 2. On vide le texte AVANT tout changement pour éviter le "rebond"
+        statusText.innerText = ""; 
+
         if (wakeLock) {
             wakeLock.release().then(() => wakeLock = null);
         }
@@ -182,15 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerVibration('end'); 
             playEndSound();
             coachingTip.innerText = currentMode.tip; 
+            statusText.innerText = "Bravo"; // On remplace le vide par "Bravo"
             switchView('end');
         } else {
-            // Réinitialisation du texte en cas d'interruption
             statusText.innerText = "Que recherchez-vous ?";
             switchView('modes');
         }
     }
 
-    // --- 5. INITIALISATION & LISTENERS ---
+    // --- 5. INITIALISATION ---
     loadStats();
 
     document.querySelectorAll('#view-modes .card').forEach(c => {
