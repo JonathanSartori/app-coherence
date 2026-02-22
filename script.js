@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let wakeLock = null;
     let currentStepIndex = 0;
     let selectedDuration = 180;
+    let audioCtx = null; // Contexte audio pour le son de fin
 
     const MODES = {
         equilibre: { steps: ['inhale', 'exhale'], times: [5000, 5000], label: "Cohérence Cardiaque", tip: "Système nerveux réinitialisé. Calme retrouvé." },
@@ -31,6 +32,54 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let currentMode = MODES.equilibre;
+
+    // --- NOUVEAU : SYSTÈME HAPTIQUE ET AUDIO ---
+
+    // Initialise le moteur audio (obligatoire au clic de l'utilisateur)
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    // Synthétise un son de bol tibétain zen (432Hz)
+    function playEndSound() {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.type = 'sine'; // Onde pure
+        osc.frequency.setValueAtTime(432, audioCtx.currentTime); 
+        
+        // Enveloppe sonore : attaque douce, résonance longue
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 0.1); 
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4); 
+
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 4);
+    }
+
+    // Gère les vibrations si le téléphone le permet (Android)
+    function triggerVibration(type) {
+        if (!('vibrate' in navigator)) return; 
+        
+        if (type === 'inhale' || type === 'exhale') {
+            navigator.vibrate(30); // Micro-impulsion unique
+        } else if (type === 'hold') {
+            navigator.vibrate([20, 50, 20]); // Double micro-impulsion pour l'apnée
+        } else if (type === 'end') {
+            navigator.vibrate([200, 100, 200]); // Vibration longue de fin
+        }
+    }
+
+    // --- FIN DU SYSTÈME HAPTIQUE ET AUDIO ---
 
     function switchView(viewName) {
         Object.values(views).forEach(v => v.classList.remove('active'));
@@ -47,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const step = currentMode.steps[currentStepIndex];
         const duration = currentMode.times[currentStepIndex];
 
-        // Nettoyage des états précédents
         clearTimeout(fadeTimeout);
         clearInterval(holdInterval);
         circle.classList.remove('apnea-active');
@@ -55,7 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
         circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
 
         if (step === 'inhale' || step === 'exhale') {
-            // Fondu de sortie pour le chiffre
+            triggerVibration(step); // <-- VIBRATION DE RESPIRATION
+            
             if (holdTimer) {
                 holdTimer.classList.remove('visible');
                 fadeTimeout = setTimeout(() => { if (holdTimer) holdTimer.innerText = ""; }, 500);
@@ -69,7 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusText.innerText = "Expiration...";
             }
         } 
-        else { // Apnées
+        else { 
+            triggerVibration('hold'); // <-- VIBRATION D'APNÉE
+
             statusText.innerText = "Bloquez";
             circle.classList.add('apnea-active');
             let secondsLeft = duration / 1000;
@@ -94,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startSession() {
+        initAudio(); // Débloque le son au moment du clic
         isActive = true; currentStepIndex = 0;
         let timeRemaining = selectedDuration;
         switchView('session');
@@ -106,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const s = (timeRemaining % 60).toString().padStart(2, '0');
                 timeLeftDisplay.innerText = `${m}:${s}`;
                 progressFill.style.width = `${((selectedDuration - timeRemaining) / selectedDuration) * 100}%`;
+                
                 if (timeRemaining <= 0) endSession(true);
             }, 1000);
         }, 1000);
@@ -121,6 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (holdTimer) { holdTimer.classList.remove('visible'); holdTimer.innerText = ""; }
 
         if (completed) {
+            playEndSound(); // <-- SON DE FIN
+            triggerVibration('end'); // <-- VIBRATION DE FIN
             statusText.innerText = "Bravo";
             coachingTip.innerText = currentMode.tip;
             switchView('end');
