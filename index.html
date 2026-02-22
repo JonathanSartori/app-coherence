@@ -16,46 +16,41 @@
     <div class="app-card">
         <header>
             <div class="logo">Platypus<span>Flow</span></div>
+            <div id="stats-container">
+                <div><span id="stat-streak">0</span> jours 🔥</div>
+                <div><span id="stat-minutes">0</span> min ✨</div>
+            </div>
             <p id="status">Que recherchez-vous ?</p>
         </header>
 
         <div id="view-modes" class="view active">
             <div class="card" data-mode="equilibre">
                 <h3>Cohérence Cardiaque</h3>
-                <p>Pour retrouver son centre. Une respiration régulière (5s/5s) qui dissipe le stress immédiat.</p>
+                <p>Pour retrouver son centre. Rythme régulier (5s/5s).</p>
             </div>
             <div class="card" data-mode="calme">
                 <h3>Retour au calme</h3>
-                <p>Pour évacuer la pression. L'expiration longue aide à relâcher les tensions physiques.</p>
+                <p>Pour évacuer la pression. Expiration longue.</p>
             </div>
             <div class="card" data-mode="sommeil">
                 <h3>Sommeil profond</h3>
-                <p>Pour s'endormir paisiblement. Un rythme très doux qui prépare le corps au repos.</p>
+                <p>Pour s'endormir paisiblement. Rythme très lent.</p>
             </div>
             <div class="card" data-mode="focus">
                 <h3>Focus & Énergie</h3>
-                <p>Pour se rebooster. Une inspiration dynamique idéale avant un moment important.</p>
+                <p>Pour se rebooster. Inspiration dynamique.</p>
             </div>
             <div class="card" data-mode="carree">
                 <h3>Respiration Carrée</h3>
-                <p>Pour la maîtrise de soi. Un décompte visuel pour retrouver une lucidité totale.</p>
+                <p>Pour la maîtrise de soi. Rythme 4-4-4-4.</p>
             </div>
         </div>
 
         <div id="view-duration" class="view">
             <button class="back-btn" id="btn-back-modes">← Changer de mode</button>
-            <div class="card" data-duration="120">
-                <h3>2 minutes</h3>
-                <p>Une pause rapide et efficace.</p>
-            </div>
-            <div class="card" data-duration="180">
-                <h3>3 minutes</h3>
-                <p>Le standard recommandé.</p>
-            </div>
-            <div class="card" data-duration="300">
-                <h3>5 minutes</h3>
-                <p>Détente et ancrage profonds.</p>
-            </div>
+            <div class="card" data-duration="120"><h3>2 minutes</h3></div>
+            <div class="card" data-duration="180"><h3>3 minutes</h3></div>
+            <div class="card" data-duration="300"><h3>5 minutes</h3></div>
         </div>
 
         <div id="view-session" class="view">
@@ -65,12 +60,10 @@
                 </div>
                 <div id="time-left">00:00</div>
             </div>
-
             <div class="visualizer">
                 <div id="guide-circle"></div>
                 <span id="hold-timer"></span>
             </div>
-
             <button id="btn-stop" class="outline-btn">Interrompre la séance</button>
         </div>
 
