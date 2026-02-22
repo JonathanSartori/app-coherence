@@ -171,14 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function endSession(completed) {
-        // 1. On coupe tout immédiatement
         isActive = false;
         clearTimeout(timeoutId); 
         clearTimeout(instructionTimeout);
         clearInterval(intervalId); 
         clearInterval(holdInterval);
         
-        // 2. On vide le texte AVANT tout changement pour éviter le "rebond"
+        // On nettoie le texte d'instruction immédiatement
         statusText.innerText = ""; 
 
         if (wakeLock) {
@@ -195,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             triggerVibration('end'); 
             playEndSound();
             coachingTip.innerText = currentMode.tip; 
-            statusText.innerText = "Bravo"; // On remplace le vide par "Bravo"
+            // On laisse statusText vide ici car il y a déjà le gros titre "Bravo" dans la vue End
             switchView('end');
         } else {
             statusText.innerText = "Que recherchez-vous ?";
