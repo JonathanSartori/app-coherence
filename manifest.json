@@ -1,10 +1,12 @@
 {
   "name": "Platypus Flow",
-  "short_name": "Platypus Flow",
-  "start_url": "index.html",
+  "short_name": "Flow",
+  "description": "Votre espace de respiration et de cohérence cardiaque.",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a2c38",
-  "theme_color": "#48c0b5",
+  "theme_color": "#1a2c38",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-512.png",
