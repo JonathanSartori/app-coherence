@@ -65,9 +65,22 @@ body {
 }
 
 #hold-timer {
-    font-weight: 800;
+    font-weight: 500;
     font-size: 1.4rem;
-    color: var(--platypus-dark);
+    /* Votre nouvelle couleur neutre (blanc à 60% d'opacité) */
+    color: rgba(255, 255, 255, 0.6); 
+    
+    /* PRÉPARATION DE L'ANIMATION */
+    opacity: 0; /* Invisible par défaut */
+    /* La transition durera 0.5 secondes, de manière fluide (ease) */
+    transition: opacity 0.5s ease;
+    /* Une petite optimisation pour dire au navigateur de s'y préparer */
+    will-change: opacity;
+}
+
+/* Le JavaScript ajoutera cette classe pendant l'apnée pour déclencher le fondu */
+#hold-timer.visible {
+    opacity: 1;
 }
 
 .apnea-active {
@@ -87,3 +100,4 @@ body {
 #coaching-tip { font-style: italic; color: var(--platypus-accent); padding: 20px; background: var(--card-bg); border-radius: 16px; margin: 20px 0; }
 footer { margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem; }
 .learn-more { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; }
+
