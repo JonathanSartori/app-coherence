@@ -40,15 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             if ('wakeLock' in navigator) {
                 wakeLock = await navigator.wakeLock.request('screen');
-                console.log("Wake Lock actif");
-                
-                // Si l'app revient du background, on relance le verrou
-                wakeLock.addEventListener('release', () => {
-                    console.log('Wake Lock relâché');
-                });
             }
         } catch (err) {
-            console.warn(`Erreur Wake Lock: ${err.name}, ${err.message}`);
+            console.warn(`Erreur Wake Lock: ${err.message}`);
         }
     }
 
@@ -137,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function startSession() {
-        // Déclenchements immédiats sur interaction utilisateur
         initAudio(); 
         await requestWakeLock(); 
 
@@ -175,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(intervalId); 
         clearInterval(holdInterval);
         
-        // Libérer le Wake Lock
         if (wakeLock) {
             wakeLock.release().then(() => wakeLock = null);
         }
@@ -192,6 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
             coachingTip.innerText = currentMode.tip; 
             switchView('end');
         } else {
+            // Réinitialisation du texte en cas d'interruption
+            statusText.innerText = "Que recherchez-vous ?";
             switchView('modes');
         }
     }
@@ -202,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#view-modes .card').forEach(c => {
         c.addEventListener('click', () => {
             currentMode = MODES[c.dataset.mode];
+            statusText.innerText = "Quelle durée ?";
             switchView('duration');
         });
     });
@@ -213,7 +208,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('btn-back-modes').addEventListener('click', () => switchView('modes'));
+    document.getElementById('btn-back-modes').addEventListener('click', () => {
+        statusText.innerText = "Que recherchez-vous ?";
+        switchView('modes');
+    });
+
     document.getElementById('btn-stop').addEventListener('click', () => endSession(false));
-    document.getElementById('btn-restart').addEventListener('click', () => switchView('modes'));
+
+    document.getElementById('btn-restart').addEventListener('click', () => { 
+        statusText.innerText = "Que recherchez-vous ?";
+        switchView('modes'); 
+    });
 });
