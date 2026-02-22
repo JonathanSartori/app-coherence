@@ -35,7 +35,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentMode = MODES.equilibre;
 
-    // --- GAMIFICATION ---
+    // --- 1. GESTION DE LA VEILLE (WAKE LOCK) ---
+    async function requestWakeLock() {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log("Wake Lock actif");
+                
+                // Si l'app revient du background, on relance le verrou
+                wakeLock.addEventListener('release', () => {
+                    console.log('Wake Lock relâché');
+                });
+            }
+        } catch (err) {
+            console.warn(`Erreur Wake Lock: ${err.name}, ${err.message}`);
+        }
+    }
+
+    // --- 2. GAMIFICATION ---
     function loadStats() {
         const stats = JSON.parse(localStorage.getItem('platypus_stats')) || { totalSeconds: 0, streak: 0, lastDate: null };
         if (stats.lastDate) {
@@ -61,10 +78,25 @@ document.addEventListener('DOMContentLoaded', () => {
         loadStats();
     }
 
-    // --- CORE ---
+    // --- 3. AUDIO & VIBRATIONS ---
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playEndSound() {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.type = 'sine'; 
+        osc.frequency.setValueAtTime(432, audioCtx.currentTime); 
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 0.1); 
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4); 
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 4);
     }
 
     function triggerVibration(type) {
@@ -74,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (type === 'end') navigator.vibrate([200, 100, 200]);
     }
 
+    // --- 4. LOGIQUE DE SÉANCE ---
     function switchView(viewName) {
         Object.values(views).forEach(v => v.classList.remove('active'));
         views[viewName].classList.add('active');
@@ -103,15 +136,27 @@ document.addEventListener('DOMContentLoaded', () => {
         timeoutId = setTimeout(updateCycle, duration);
     }
 
-    function startSession() {
-        initAudio(); isActive = true; currentStepIndex = 0;
+    async function startSession() {
+        // Déclenchements immédiats sur interaction utilisateur
+        initAudio(); 
+        await requestWakeLock(); 
+
+        isActive = true; 
+        currentStepIndex = 0;
         let timeRemaining = selectedDuration;
+        
         document.body.classList.add('session-mode');
         statusText.classList.remove('text-hidden');
-        instructionTimeout = setTimeout(() => statusText.classList.add('text-hidden'), 30000);
+        
+        instructionTimeout = setTimeout(() => {
+            if(isActive) statusText.classList.add('text-hidden');
+        }, 30000);
+
         switchView('session');
+        
         setTimeout(() => {
-            if(!isActive) return; updateCycle();
+            if(!isActive) return; 
+            updateCycle();
             intervalId = setInterval(() => {
                 timeRemaining--;
                 const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
@@ -124,19 +169,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function endSession(completed) {
-        isActive = false; clearTimeout(timeoutId); clearTimeout(instructionTimeout);
-        clearInterval(intervalId); clearInterval(holdInterval);
+        isActive = false;
+        clearTimeout(timeoutId); 
+        clearTimeout(instructionTimeout);
+        clearInterval(intervalId); 
+        clearInterval(holdInterval);
+        
+        // Libérer le Wake Lock
+        if (wakeLock) {
+            wakeLock.release().then(() => wakeLock = null);
+        }
+
         document.body.classList.remove('session-mode');
         statusText.classList.remove('text-hidden');
         circle.style.transform = "scale(1)";
         holdTimer.classList.remove('visible');
-        if (completed) { saveStats(selectedDuration); triggerVibration('end'); coachingTip.innerText = currentMode.tip; switchView('end'); }
-        else { switchView('modes'); }
+
+        if (completed) {
+            saveStats(selectedDuration); 
+            triggerVibration('end'); 
+            playEndSound();
+            coachingTip.innerText = currentMode.tip; 
+            switchView('end');
+        } else {
+            switchView('modes');
+        }
     }
 
+    // --- 5. INITIALISATION & LISTENERS ---
     loadStats();
-    document.querySelectorAll('#view-modes .card').forEach(c => c.addEventListener('click', () => { currentMode = MODES[c.dataset.mode]; switchView('duration'); }));
-    document.querySelectorAll('#view-duration .card').forEach(c => c.addEventListener('click', () => { selectedDuration = parseInt(c.dataset.duration); startSession(); }));
+
+    document.querySelectorAll('#view-modes .card').forEach(c => {
+        c.addEventListener('click', () => {
+            currentMode = MODES[c.dataset.mode];
+            switchView('duration');
+        });
+    });
+
+    document.querySelectorAll('#view-duration .card').forEach(c => {
+        c.addEventListener('click', () => {
+            selectedDuration = parseInt(c.dataset.duration);
+            startSession();
+        });
+    });
+
     document.getElementById('btn-back-modes').addEventListener('click', () => switchView('modes'));
     document.getElementById('btn-stop').addEventListener('click', () => endSession(false));
     document.getElementById('btn-restart').addEventListener('click', () => switchView('modes'));
