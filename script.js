@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const coachingTip = document.getElementById('coaching-tip');
     const streakDisplay = document.getElementById('stat-streak');
     const minutesDisplay = document.getElementById('stat-minutes');
+    const btnExit = document.getElementById('btn-exit');
 
     let isActive = false;
     let timeoutId = null;
@@ -26,16 +27,35 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx = null;
 
     const MODES = {
-        equilibre: { steps: ['inhale', 'exhale'], times: [5000, 5000], tip: "Cohérence Cardiaque effectuée. Calme retrouvé." },
-        calme: { steps: ['inhale', 'exhale'], times: [4000, 6000], tip: "Tensions évacuées. Gardez ce relâchement." },
-        sommeil: { steps: ['inhale', 'exhale'], times: [4000, 8000], tip: "Prêt pour le repos. Bonne nuit." },
-        focus: { steps: ['inhale', 'exhale'], times: [6000, 4000], tip: "Esprit vif. Passez à l'action !" },
-        carree: { steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], tip: "Maîtrise totale. Lucidité maximale." }
+        equilibre: { 
+            steps: ['inhale', 'exhale'], times: [5000, 5000], 
+            tip: "Votre rythme cardiaque s'est synchronisé avec votre respiration.",
+            exitText: "Je me sens en équilibre" 
+        },
+        calme: { 
+            steps: ['inhale', 'exhale'], times: [4000, 6000], 
+            tip: "L'expiration longue a activé votre système nerveux parasympathique.",
+            exitText: "Je me sens apaisé(e)" 
+        },
+        sommeil: { 
+            steps: ['inhale', 'exhale'], times: [4000, 8000], 
+            tip: "Votre corps est maintenant en mode récupération profonde.",
+            exitText: "Je suis prêt(e) pour la nuit" 
+        },
+        focus: { 
+            steps: ['inhale', 'exhale'], times: [6000, 4000], 
+            tip: "L'apport d'oxygène a réveillé votre vigilance cognitive.",
+            exitText: "Je me sens lucide et prêt(e)" 
+        },
+        carree: { 
+            steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], 
+            tip: "La rétention a stabilisé votre flux mental.",
+            exitText: "Je garde cette maîtrise" 
+        }
     };
 
     let currentMode = MODES.equilibre;
 
-    // --- 1. GESTION DE LA VEILLE ---
     async function requestWakeLock() {
         try {
             if ('wakeLock' in navigator) {
@@ -46,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. GAMIFICATION ---
     function loadStats() {
         const stats = JSON.parse(localStorage.getItem('platypus_stats')) || { totalSeconds: 0, streak: 0, lastDate: null };
         if (stats.lastDate) {
@@ -72,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadStats();
     }
 
-    // --- 3. AUDIO & VIBRATIONS ---
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -100,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (type === 'end') navigator.vibrate([200, 100, 200]);
     }
 
-    // --- 4. LOGIQUE DE SÉANCE ---
     function switchView(viewName) {
         Object.values(views).forEach(v => v.classList.remove('active'));
         views[viewName].classList.add('active');
@@ -108,10 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateCycle() {
         if (!isActive) return;
-        
         const step = currentMode.steps[currentStepIndex];
         const duration = currentMode.times[currentStepIndex];
-        
         clearInterval(holdInterval);
         circle.classList.remove('apnea-active');
         circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
@@ -134,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let sec = duration / 1000; holdTimer.innerText = sec; holdTimer.classList.add('visible');
             holdInterval = setInterval(() => { sec--; if (sec > 0) holdTimer.innerText = sec; }, 1000);
         }
-        
         currentStepIndex = (currentStepIndex + 1) % currentMode.steps.length;
         timeoutId = setTimeout(updateCycle, duration);
     }
@@ -142,20 +156,15 @@ document.addEventListener('DOMContentLoaded', () => {
     async function startSession() {
         initAudio(); 
         await requestWakeLock(); 
-
         isActive = true; 
         currentStepIndex = 0;
         let timeRemaining = selectedDuration;
-        
         document.body.classList.add('session-mode');
         statusText.classList.remove('text-hidden');
-        
         instructionTimeout = setTimeout(() => {
             if(isActive) statusText.classList.add('text-hidden');
         }, 30000);
-
         switchView('session');
-        
         setTimeout(() => {
             if(!isActive) return; 
             updateCycle();
@@ -176,25 +185,21 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(instructionTimeout);
         clearInterval(intervalId); 
         clearInterval(holdInterval);
-        
-        // On nettoie le texte d'instruction immédiatement
         statusText.innerText = ""; 
-
         if (wakeLock) {
             wakeLock.release().then(() => wakeLock = null);
         }
-
         document.body.classList.remove('session-mode');
         statusText.classList.remove('text-hidden');
         circle.style.transform = "scale(1)";
         holdTimer.classList.remove('visible');
-
         if (completed) {
             saveStats(selectedDuration); 
             triggerVibration('end'); 
             playEndSound();
             coachingTip.innerText = currentMode.tip; 
-            // On laisse statusText vide ici car il y a déjà le gros titre "Bravo" dans la vue End
+            // Mise à jour de l'affirmation positive sur le bouton
+            btnExit.innerText = currentMode.exitText;
             switchView('end');
         } else {
             statusText.innerText = "Que recherchez-vous ?";
@@ -202,9 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 5. INITIALISATION ---
     loadStats();
-
     document.querySelectorAll('#view-modes .card').forEach(c => {
         c.addEventListener('click', () => {
             currentMode = MODES[c.dataset.mode];
@@ -212,23 +215,26 @@ document.addEventListener('DOMContentLoaded', () => {
             switchView('duration');
         });
     });
-
     document.querySelectorAll('#view-duration .card').forEach(c => {
         c.addEventListener('click', () => {
             selectedDuration = parseInt(c.dataset.duration);
             startSession();
         });
     });
-
     document.getElementById('btn-back-modes').addEventListener('click', () => {
         statusText.innerText = "Que recherchez-vous ?";
         switchView('modes');
     });
-
     document.getElementById('btn-stop').addEventListener('click', () => endSession(false));
-
     document.getElementById('btn-restart').addEventListener('click', () => { 
         statusText.innerText = "Que recherchez-vous ?";
         switchView('modes'); 
+    });
+    btnExit.addEventListener('click', () => {
+        statusText.innerText = "Que recherchez-vous ?";
+        switchView('modes');
+        if (window.history.length <= 1) {
+            window.close();
+        }
     });
 });
