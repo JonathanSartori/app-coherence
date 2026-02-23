@@ -100,20 +100,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const step = currentMode.steps[currentStepIndex];
         const duration = currentMode.times[currentStepIndex];
         clearInterval(holdInterval);
-        circle.classList.remove('apnea-active');
-        circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
+        if(circle) {
+            circle.classList.remove('apnea-active');
+            circle.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.6, 1)`;
+        }
 
         if (step === 'inhale' || step === 'exhale') {
             triggerVibration(step);
-            holdTimer.classList.remove('visible');
-            if (step === 'inhale') { circle.style.transform = "scale(4.2)"; statusText.innerText = "Inspiration..."; }
-            else { circle.style.transform = "scale(1)"; statusText.innerText = "Expiration..."; }
+            if(holdTimer) holdTimer.classList.remove('visible');
+            if (step === 'inhale') { 
+                if(circle) circle.style.transform = "scale(4.2)"; 
+                if(statusText) statusText.innerText = "Inspiration..."; 
+            }
+            else { 
+                if(circle) circle.style.transform = "scale(1)"; 
+                if(statusText) statusText.innerText = "Expiration..."; 
+            }
         } else { 
             triggerVibration('hold');
-            statusText.innerText = "Bloquez";
-            circle.classList.add('apnea-active');
-            let sec = duration / 1000; holdTimer.innerText = sec; holdTimer.classList.add('visible');
-            holdInterval = setInterval(() => { sec--; if (sec > 0) holdTimer.innerText = sec; }, 1000);
+            if(statusText) statusText.innerText = "Bloquez";
+            if(circle) circle.classList.add('apnea-active');
+            let sec = duration / 1000; 
+            if(holdTimer) {
+                holdTimer.innerText = sec; 
+                holdTimer.classList.add('visible');
+            }
+            holdInterval = setInterval(() => { sec--; if (sec > 0 && holdTimer) holdTimer.innerText = sec; }, 1000);
         }
         currentStepIndex = (currentStepIndex + 1) % currentMode.steps.length;
         timeoutId = setTimeout(updateCycle, duration);
@@ -126,8 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStepIndex = 0;
         let timeRemaining = selectedDuration;
         document.body.classList.add('session-mode');
-        statusText.classList.remove('text-hidden');
-        instructionTimeout = setTimeout(() => { if(isActive) statusText.classList.add('text-hidden'); }, 30000);
+        if(statusText) statusText.classList.remove('text-hidden');
+        instructionTimeout = setTimeout(() => { if(isActive && statusText) statusText.classList.add('text-hidden'); }, 30000);
         switchView('session');
         setTimeout(() => {
             if(!isActive) return; 
@@ -149,10 +161,14 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(instructionTimeout);
         clearInterval(intervalId); 
         clearInterval(holdInterval);
-        if (statusText) statusText.innerText = ""; 
+        
+        if (statusText) {
+            statusText.innerText = ""; 
+            statusText.classList.remove('text-hidden');
+        }
+        
         if (wakeLock) { wakeLock.release().then(() => wakeLock = null).catch(()=>{}); }
         document.body.classList.remove('session-mode');
-        if (statusText) statusText.classList.remove('text-hidden');
         if (circle) circle.style.transform = "scale(1)";
         if (holdTimer) holdTimer.classList.remove('visible');
 
@@ -174,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#view-modes .card').forEach(c => {
         c.addEventListener('click', () => {
             currentMode = MODES[c.dataset.mode];
-            statusText.innerText = "Quelle durée ?";
+            if(statusText) statusText.innerText = "Quelle durée ?";
             switchView('duration');
         });
     });
@@ -184,19 +200,25 @@ document.addEventListener('DOMContentLoaded', () => {
             startSession();
         });
     });
-    document.getElementById('btn-back-modes').addEventListener('click', () => {
-        statusText.innerText = "Que recherchez-vous ?";
+    const backBtn = document.getElementById('btn-back-modes');
+    if(backBtn) backBtn.addEventListener('click', () => {
+        if(statusText) statusText.innerText = "Que recherchez-vous ?";
         switchView('modes');
     });
-    document.getElementById('btn-stop').addEventListener('click', () => endSession(false));
-    document.getElementById('btn-restart').addEventListener('click', () => { 
-        statusText.innerText = "Que recherchez-vous ?";
+    
+    const stopBtn = document.getElementById('btn-stop');
+    if(stopBtn) stopBtn.addEventListener('click', () => endSession(false));
+    
+    const restartBtn = document.getElementById('btn-restart');
+    if(restartBtn) restartBtn.addEventListener('click', () => { 
+        if(statusText) statusText.innerText = "Que recherchez-vous ?";
         switchView('modes'); 
     });
+
     const finalExitBtn = document.getElementById('btn-exit');
     if (finalExitBtn) {
         finalExitBtn.addEventListener('click', () => {
-            statusText.innerText = "Que recherchez-vous ?";
+            if(statusText) statusText.innerText = "Que recherchez-vous ?";
             switchView('modes');
             if (window.history.length <= 1) { window.close(); }
         });
