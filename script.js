@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const coachingTip = document.getElementById('coaching-tip');
     const streakDisplay = document.getElementById('stat-streak');
     const minutesDisplay = document.getElementById('stat-minutes');
-    const btnExit = document.getElementById('btn-exit');
 
     let isActive = false;
     let timeoutId = null;
@@ -27,43 +26,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx = null;
 
     const MODES = {
-        equilibre: { 
-            steps: ['inhale', 'exhale'], times: [5000, 5000], 
-            tip: "Votre rythme cardiaque s'est synchronisé avec votre respiration.",
-            exitText: "Je me sens en équilibre" 
-        },
-        calme: { 
-            steps: ['inhale', 'exhale'], times: [4000, 6000], 
-            tip: "L'expiration longue a activé votre système nerveux parasympathique.",
-            exitText: "Je me sens apaisé(e)" 
-        },
-        sommeil: { 
-            steps: ['inhale', 'exhale'], times: [4000, 8000], 
-            tip: "Votre corps est maintenant en mode récupération profonde.",
-            exitText: "Je suis prêt(e) pour la nuit" 
-        },
-        focus: { 
-            steps: ['inhale', 'exhale'], times: [6000, 4000], 
-            tip: "L'apport d'oxygène a réveillé votre vigilance cognitive.",
-            exitText: "Je me sens lucide et prêt(e)" 
-        },
-        carree: { 
-            steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], 
-            tip: "La rétention a stabilisé votre flux mental.",
-            exitText: "Je garde cette maîtrise" 
-        }
+        equilibre: { steps: ['inhale', 'exhale'], times: [5000, 5000], tip: "Votre rythme cardiaque s'est synchronisé avec votre respiration.", exitText: "Je me sens en équilibre" },
+        calme: { steps: ['inhale', 'exhale'], times: [4000, 6000], tip: "L'expiration longue a activé votre système nerveux parasympathique.", exitText: "Je me sens apaisé(e)" },
+        sommeil: { steps: ['inhale', 'exhale'], times: [4000, 8000], tip: "Votre corps est maintenant en mode récupération profonde.", exitText: "Je suis prêt(e) pour la nuit" },
+        focus: { steps: ['inhale', 'exhale'], times: [6000, 4000], tip: "L'apport d'oxygène a réveillé votre vigilance cognitive.", exitText: "Je me sens lucide et prêt(e)" },
+        carree: { steps: ['inhale', 'holdFull', 'exhale', 'holdEmpty'], times: [4000, 4000, 4000, 4000], tip: "La rétention a stabilisé votre flux mental.", exitText: "Je garde cette maîtrise" }
     };
 
     let currentMode = MODES.equilibre;
 
     async function requestWakeLock() {
         try {
-            if ('wakeLock' in navigator) {
-                wakeLock = await navigator.wakeLock.request('screen');
-            }
-        } catch (err) {
-            console.warn(`Erreur Wake Lock: ${err.message}`);
-        }
+            if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
+        } catch (err) { console.warn(`Wake Lock: ${err.message}`); }
     }
 
     function loadStats() {
@@ -74,8 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const diffDays = Math.floor((today - last) / (1000 * 60 * 60 * 24));
             if (diffDays > 1) stats.streak = 0; 
         }
-        minutesDisplay.innerText = Math.floor(stats.totalSeconds / 60);
-        streakDisplay.innerText = stats.streak;
+        if (minutesDisplay) minutesDisplay.innerText = Math.floor(stats.totalSeconds / 60);
+        if (streakDisplay) streakDisplay.innerText = stats.streak;
         return stats;
     }
 
@@ -83,10 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let stats = loadStats();
         const today = new Date().toDateString();
         stats.totalSeconds += duration;
-        if (stats.lastDate !== today) {
-            stats.streak += 1;
-            stats.lastDate = today;
-        }
+        if (stats.lastDate !== today) { stats.streak += 1; stats.lastDate = today; }
         localStorage.setItem('platypus_stats', JSON.stringify(stats));
         loadStats();
     }
@@ -119,8 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchView(viewName) {
-        Object.values(views).forEach(v => v.classList.remove('active'));
-        views[viewName].classList.add('active');
+        Object.values(views).forEach(v => { if(v) v.classList.remove('active'); });
+        if(views[viewName]) views[viewName].classList.add('active');
     }
 
     function updateCycle() {
@@ -134,14 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (step === 'inhale' || step === 'exhale') {
             triggerVibration(step);
             holdTimer.classList.remove('visible');
-            if (step === 'inhale') { 
-                circle.style.transform = "scale(4.2)"; 
-                statusText.innerText = "Inspiration..."; 
-            }
-            else { 
-                circle.style.transform = "scale(1)"; 
-                statusText.innerText = "Expiration..."; 
-            }
+            if (step === 'inhale') { circle.style.transform = "scale(4.2)"; statusText.innerText = "Inspiration..."; }
+            else { circle.style.transform = "scale(1)"; statusText.innerText = "Expiration..."; }
         } else { 
             triggerVibration('hold');
             statusText.innerText = "Bloquez";
@@ -161,9 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let timeRemaining = selectedDuration;
         document.body.classList.add('session-mode');
         statusText.classList.remove('text-hidden');
-        instructionTimeout = setTimeout(() => {
-            if(isActive) statusText.classList.add('text-hidden');
-        }, 30000);
+        instructionTimeout = setTimeout(() => { if(isActive) statusText.classList.add('text-hidden'); }, 30000);
         switchView('session');
         setTimeout(() => {
             if(!isActive) return; 
@@ -172,8 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeRemaining--;
                 const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
                 const s = (timeRemaining % 60).toString().padStart(2, '0');
-                timeLeftDisplay.innerText = `${m}:${s}`;
-                progressFill.style.width = `${((selectedDuration - timeRemaining) / selectedDuration) * 100}%`;
+                if(timeLeftDisplay) timeLeftDisplay.innerText = `${m}:${s}`;
+                if(progressFill) progressFill.style.width = `${((selectedDuration - timeRemaining) / selectedDuration) * 100}%`;
                 if (timeRemaining <= 0) endSession(true);
             }, 1000);
         }, 1000);
@@ -185,24 +149,23 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(instructionTimeout);
         clearInterval(intervalId); 
         clearInterval(holdInterval);
-        statusText.innerText = ""; 
-        if (wakeLock) {
-            wakeLock.release().then(() => wakeLock = null);
-        }
+        if (statusText) statusText.innerText = ""; 
+        if (wakeLock) { wakeLock.release().then(() => wakeLock = null).catch(()=>{}); }
         document.body.classList.remove('session-mode');
-        statusText.classList.remove('text-hidden');
-        circle.style.transform = "scale(1)";
-        holdTimer.classList.remove('visible');
+        if (statusText) statusText.classList.remove('text-hidden');
+        if (circle) circle.style.transform = "scale(1)";
+        if (holdTimer) holdTimer.classList.remove('visible');
+
         if (completed) {
             saveStats(selectedDuration); 
             triggerVibration('end'); 
             playEndSound();
-            coachingTip.innerText = currentMode.tip; 
-            // Mise à jour de l'affirmation positive sur le bouton
-            btnExit.innerText = currentMode.exitText;
+            if (coachingTip) coachingTip.innerText = currentMode.tip; 
+            const exitBtnElement = document.getElementById('btn-exit');
+            if (exitBtnElement) exitBtnElement.innerText = currentMode.exitText;
             switchView('end');
         } else {
-            statusText.innerText = "Que recherchez-vous ?";
+            if (statusText) statusText.innerText = "Que recherchez-vous ?";
             switchView('modes');
         }
     }
@@ -230,11 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
         statusText.innerText = "Que recherchez-vous ?";
         switchView('modes'); 
     });
-    btnExit.addEventListener('click', () => {
-        statusText.innerText = "Que recherchez-vous ?";
-        switchView('modes');
-        if (window.history.length <= 1) {
-            window.close();
-        }
-    });
+    const finalExitBtn = document.getElementById('btn-exit');
+    if (finalExitBtn) {
+        finalExitBtn.addEventListener('click', () => {
+            statusText.innerText = "Que recherchez-vous ?";
+            switchView('modes');
+            if (window.history.length <= 1) { window.close(); }
+        });
+    }
 });
