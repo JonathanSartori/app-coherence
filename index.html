@@ -11,15 +11,18 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-512.png">
     <link rel="apple-touch-icon" href="icon-512.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-card">
         <header>
             <div class="logo">Platypus<span>Flow</span></div>
+            
             <div id="stats-container">
                 <div><span id="stat-streak">0</span> jours 🔥</div>
                 <div><span id="stat-minutes">0</span> min ✨</div>
             </div>
+            
             <p id="status">Que recherchez-vous ?</p>
         </header>
 
@@ -71,12 +74,14 @@
             <h2 id="end-title">Bravo.</h2>
             <div id="coaching-tip"></div>
             <button id="btn-restart" class="primary-btn">Nouvelle séance</button>
+            <button id="btn-exit" class="outline-btn" style="margin-top: 10px;">Poursuivre mon élan</button>
         </div>
 
         <footer>
             <a href="https://github.com/JonathanSartori/app-coherence/" target="_blank" class="learn-more">Projet GitHub : Platypus Flow →</a>
         </footer>
     </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
